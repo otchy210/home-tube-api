@@ -1,0 +1,26 @@
+{
+  "name": "@otchy/home-tube-api",
+  "version": "0.0.0",
+  "description": "API Server for HomeTube",
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+ "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/otchy210/home-tube-api.git"
+  },
+  "author": "Toru Ochiai <npm@otchy.net> (https://twitter.com/otchy)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/otchy210/home-tube-api/issues"
+  },
+  "homepage": "https://github.com/otchy210/home-tube-api#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
