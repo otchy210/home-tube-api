@@ -1,3 +1,3 @@
-import Server from './Server';
+import ApiServer from './ApiServer';
 
-export { Server };
+export { ApiServer };

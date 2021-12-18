@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import { unlinkSync } from 'fs';
-import { DEFAULT_APP_CONFIG, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './Server';
+import { DEFAULT_APP_CONFIG, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './ApiServer';
 
 const TEST_CONFIG_PATH = './test/test-config.json';
 const TEST_CONFIG_TMP_PATH = './tmp/test-config.json';
