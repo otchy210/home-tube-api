@@ -1,6 +1,6 @@
 {
   "name": "@otchy/home-tube-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "API Server for HomeTube",
   "type": "module",
   "main": "dist/index.js",
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
+    "@types/node": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
     "eslint": "^7.32.0",
