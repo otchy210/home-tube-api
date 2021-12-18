@@ -1,6 +1,6 @@
 {
   "name": "@otchy/home-tube-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "API Server for HomeTube",
   "type": "module",
   "main": "dist/index.js",
@@ -26,6 +26,17 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
     "typescript": "^4.5.4"
+  },
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "preset": "ts-jest/presets/default-esm"
   }
 }

@@ -1,1 +1,3 @@
-console.log('index.ts');
+export const one = () => {
+    return 1;
+}
