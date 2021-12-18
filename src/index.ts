@@ -1,3 +1,3 @@
-export const one = () => {
-    return 1;
-};
+import Server from './Server';
+
+export { Server };
