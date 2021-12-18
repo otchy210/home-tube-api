@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { AppConfig, ServerConfig } from './types';
@@ -21,6 +21,10 @@ export const loadAppConfig = (path: string): AppConfig => {
     const savedConfigJson = readFileSync(path).toString();
     const savedConfig = JSON.parse(savedConfigJson) as AppConfig;
     return { ...DEFAULT_APP_CONFIG, ...savedConfig };
+};
+
+export const saveAppConfig = (path: string, appConfig: AppConfig): void => {
+    writeFileSync(path, JSON.stringify(appConfig, undefined, 2));
 };
 
 export default class Server {
