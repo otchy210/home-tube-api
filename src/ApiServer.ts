@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { homedir } from 'os';
 import { join } from 'path';
+import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
 import { AppConfig, Json, RequestHandler, RequestProps, ServerConfig } from './types';
 
 export const DEFAULT_APP_CONFIG_FILE = '.home-tube-config.json';
@@ -28,22 +29,63 @@ export const saveAppConfig = (path: string, appConfig: AppConfig): void => {
     writeFileSync(path, JSON.stringify(appConfig, undefined, 2));
 };
 
-const writeBadRequest = (res: ServerResponse): void => {
-    res.writeHead(400, 'Bad Request');
-    res.end();
-};
-
-const writeNotFound = (res: ServerResponse): void => {
-    res.writeHead(404, 'Not Found');
-    res.end();
-};
-
-const writeMethodNotAllowed = (res: ServerResponse): void => {
-    res.writeHead(405, 'Method Not Allowed');
-    res.end();
-};
-
 const supportedMethods = ['GET', 'POST', 'DELETE'];
+
+export const handleRequest = (appConfig: AppConfig, request: IncomingMessage, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
+    const { method, url } = request;
+    if (method === undefined) {
+        writeBadRequest(response);
+        return;
+    }
+    if (!supportedMethods.includes(method)) {
+        writeMethodNotAllowed(response);
+        return;
+    }
+    if (url === undefined) {
+        writeNotFound(response);
+        return;
+    }
+    // TODO: need to parse params
+    if (!requestHandlers.has(url)) {
+        writeNotFound(response);
+        return;
+    }
+    const handler = requestHandlers.get(url);
+    const props: RequestProps = {
+        appConfig,
+        request,
+    };
+    let jsonResponse: Json | undefined;
+    switch (method) {
+        case 'GET':
+            if (handler?.get === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            jsonResponse = handler.get(props);
+            break;
+        case 'POST':
+            if (handler?.post === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            // TODO: need to parse body
+            jsonResponse = handler.post(props);
+            break;
+        case 'DELETE':
+            if (handler?.delete === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            jsonResponse = handler.delete(props);
+            break;
+    }
+    response.writeHead(200, {
+        'Content-Type': 'application/json; charset=UTF-8',
+    });
+    response.write(JSON.stringify(jsonResponse));
+    response.end();
+};
 
 export default class ApiServer {
     private port: number;
@@ -83,60 +125,7 @@ export default class ApiServer {
     }
 
     private requestListener = (req: IncomingMessage, res: ServerResponse): void => {
-        // TODO: need test
-        const { method, url } = req;
-        if (method === undefined) {
-            writeBadRequest(res);
-            return;
-        }
-        if (!supportedMethods.includes(method)) {
-            writeMethodNotAllowed(res);
-            return;
-        }
-        if (url === undefined) {
-            writeNotFound(res);
-            return;
-        }
-        // TODO: need to parse params
-        if (!this.requestHandlers.has(url)) {
-            writeNotFound(res);
-            return;
-        }
-        const handler = this.requestHandlers.get(url);
-        const props: RequestProps = {
-            appConfig: this.appConfig,
-            request: req,
-        };
-        let response: Json | undefined;
-        switch (method) {
-            case 'GET':
-                if (handler?.get === undefined) {
-                    writeMethodNotAllowed(res);
-                    return;
-                }
-                response = handler.get(props);
-                break;
-            case 'POST':
-                if (handler?.post === undefined) {
-                    writeMethodNotAllowed(res);
-                    return;
-                }
-                // TODO: need to parse body
-                response = handler.post(props);
-                break;
-            case 'DELETE':
-                if (handler?.delete === undefined) {
-                    writeMethodNotAllowed(res);
-                    return;
-                }
-                response = handler.delete(props);
-                break;
-        }
-        res.writeHead(200, {
-            'Content-Type': 'application/json; charset=UTF-8',
-        });
-        res.write(JSON.stringify(response));
-        res.end();
+        handleRequest(this.appConfig, req, res, this.requestHandlers);
     };
 
     public close(): ApiServer {
