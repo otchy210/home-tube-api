@@ -1,38 +1,49 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
-import { homedir } from 'os';
-import { join } from 'path';
+import { getDefaultAppConfigPath, loadAppConfig } from './AppConfigUtils';
 import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
-import { AppConfig, Json, RequestHandler, RequestProps, ServerConfig } from './types';
-
-export const DEFAULT_APP_CONFIG_FILE = '.home-tube-config.json';
-
-export const getDefaultAppConfigPath = (): string => {
-    const home = homedir();
-    return join(home, DEFAULT_APP_CONFIG_FILE);
-};
-
-export const DEFAULT_APP_CONFIG: AppConfig = {
-    videoStorages: [],
-};
-
-export const loadAppConfig = (path: string): AppConfig => {
-    if (!existsSync(path)) {
-        return DEFAULT_APP_CONFIG;
-    }
-    const savedConfigJson = readFileSync(path).toString();
-    const savedConfig = JSON.parse(savedConfigJson) as AppConfig;
-    return { ...DEFAULT_APP_CONFIG, ...savedConfig };
-};
-
-export const saveAppConfig = (path: string, appConfig: AppConfig): void => {
-    writeFileSync(path, JSON.stringify(appConfig, undefined, 2));
-};
+import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig } from './types';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
-export const handleRequest = (appConfig: AppConfig, request: IncomingMessage, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
-    const { method, url } = request;
+export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler, bodyChunks: Array<Uint8Array>) => {
+    if (bodyChunks.length > 0) {
+        const bodyBuffer = Buffer.concat(bodyChunks);
+        context.body = JSON.parse(bodyBuffer.toString()) as Json;
+    }
+
+    let jsonResponse: Json | undefined;
+    switch (context.request.method) {
+        case 'GET':
+            if (handler?.get === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            jsonResponse = handler.get(context);
+            break;
+        case 'POST':
+            if (handler?.post === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            jsonResponse = handler.post(context);
+            break;
+        case 'DELETE':
+            if (handler?.delete === undefined) {
+                writeMethodNotAllowed(response);
+                return;
+            }
+            jsonResponse = handler.delete(context);
+            break;
+    }
+    response.writeHead(200, {
+        'Content-Type': 'application/json; charset=UTF-8',
+    });
+    response.write(JSON.stringify(jsonResponse));
+    response.end();
+};
+
+export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
+    const { method, url } = context.request;
     if (method === undefined) {
         writeBadRequest(response);
         return;
@@ -50,54 +61,33 @@ export const handleRequest = (appConfig: AppConfig, request: IncomingMessage, re
         writeNotFound(response);
         return;
     }
-    const handler = requestHandlers.get(url);
-    const props: RequestProps = {
-        appConfig,
-        request,
-    };
-    let jsonResponse: Json | undefined;
-    switch (method) {
-        case 'GET':
-            if (handler?.get === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            jsonResponse = handler.get(props);
-            break;
-        case 'POST':
-            if (handler?.post === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            // TODO: need to parse body
-            jsonResponse = handler.post(props);
-            break;
-        case 'DELETE':
-            if (handler?.delete === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            jsonResponse = handler.delete(props);
-            break;
-    }
-    response.writeHead(200, {
-        'Content-Type': 'application/json; charset=UTF-8',
+    const handler = requestHandlers.get(url) as RequestHandler;
+
+    const bodyChunks = new Array<Uint8Array>();
+    context.request.on('data', (chunk) => {
+        bodyChunks.push(chunk);
     });
-    response.write(JSON.stringify(jsonResponse));
-    response.end();
+    context.request.on('end', () => {
+        handleRequestEnd(context, response, handler, bodyChunks);
+    });
 };
 
 export default class ApiServer {
     private port: number;
+    private appConfigPath: string;
     private appConfig: AppConfig;
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
 
     public constructor(serverConfig: ServerConfig) {
         this.port = serverConfig.port;
-        const appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
-        this.appConfig = loadAppConfig(appConfigPath);
+        this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
+        this.appConfig = loadAppConfig(this.appConfigPath);
         this.httpServer = createServer(this.requestListener);
+    }
+
+    public getAppConfigPath(): string {
+        return this.appConfigPath;
     }
 
     public getAppConfig(): AppConfig {
@@ -124,8 +114,13 @@ export default class ApiServer {
         });
     }
 
-    private requestListener = (req: IncomingMessage, res: ServerResponse): void => {
-        handleRequest(this.appConfig, req, res, this.requestHandlers);
+    private requestListener = (request: IncomingMessage, response: ServerResponse): void => {
+        const context = {
+            apiServer: this,
+            appConfig: this.appConfig,
+            request,
+        } as RequestContext;
+        handleRequest(context, response, this.requestHandlers);
     };
 
     public close(): ApiServer {

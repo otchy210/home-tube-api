@@ -1,4 +1,6 @@
 import { IncomingMessage } from 'http';
+import ApiServer from './ApiServer';
+import { ErrorResponse } from './ServerResponseUtils';
 
 export type ServerConfig = {
     port: number;
@@ -14,16 +16,18 @@ export type AppConfig = {
     videoStorages: VideoStorage[];
 };
 
-export type RequestProps = {
+export type RequestContext = {
+    apiServer: ApiServer;
     appConfig: AppConfig;
     request: IncomingMessage;
+    body?: Json;
 };
 
 export type RequestHandler = {
     path: string;
-    get?: (props: RequestProps) => Json;
-    post?: (props: RequestProps) => Json;
-    delete?: (props: RequestProps) => Json;
+    get?: (context: RequestContext) => Json | ErrorResponse;
+    post?: (context: RequestContext) => Json | ErrorResponse;
+    delete?: (context: RequestContext) => Json | ErrorResponse;
 };
 
 type JsonPrimitive = string | number | boolean | null;
