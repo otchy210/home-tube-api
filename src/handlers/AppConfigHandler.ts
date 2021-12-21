@@ -1,6 +1,6 @@
-import { saveAppConfig } from './AppConfigUtils';
-import { BAD_REQUEST } from './ServerResponseUtils';
-import { RequestHandler } from './types';
+import { saveAppConfig } from '../utils/AppConfigUtils';
+import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import { RequestHandler } from '../types';
 
 export const appConfigHandler: RequestHandler = {
     path: '/appConfig',

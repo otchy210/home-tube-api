@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { readFileSync, unlinkSync } from 'fs';
-import { Json, RequestHandler } from './types';
-import { ApiServer } from '.';
+import { Json, RequestHandler } from '../types';
+import ApiServer from '../ApiServer';
 
 export const TEST_CONFIG_PATH = './test/test-config.json';
 export const TEST_CONFIG_TMP_PATH = './tmp/test-config.json';
@@ -24,9 +24,7 @@ const TEST_HTTP_PORT = 12345;
 export const removeTestConfigTmpFile = () => {
     try {
         unlinkSync(TEST_CONFIG_TMP_PATH);
-    } catch (e) {
-        console.debug(`failed to remove ${TEST_CONFIG_TMP_PATH}`);
-    }
+    } catch (e) {} // eslint-disable-line no-empty
 };
 
 export const readTestConfigTmpFileAsJson = (): Json => {

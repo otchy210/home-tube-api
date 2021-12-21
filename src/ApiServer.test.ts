@@ -1,10 +1,10 @@
 import ApiServer, { handleRequestEnd } from './ApiServer';
 import { IncomingMessage, ServerResponse } from 'http';
 import { handleRequest } from './ApiServer';
-import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
+import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
 import { AppConfig, RequestContext, RequestHandler } from './types';
 
-jest.mock('./ServerResponseUtils');
+jest.mock('./utils/ServerResponseUtils');
 
 describe('handleRequest', () => {
     const mockedApiServer = {} as ApiServer;

@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
-import { getDefaultAppConfigPath, loadAppConfig } from './AppConfigUtils';
-import { ErrorResponse, isErrorResponse, writeBadRequest, writeErrorResponse, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
-import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig } from './types';
+import { getDefaultAppConfigPath, loadAppConfig } from './utils/AppConfigUtils';
+import { isErrorResponse, writeBadRequest, writeErrorResponse, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
+import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig } from './types';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 

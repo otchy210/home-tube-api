@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
-import { AppConfig } from './types';
+import { AppConfig } from '../types';
 
 export const DEFAULT_APP_CONFIG_FILE = '.home-tube-config.json';
 

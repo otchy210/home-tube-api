@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http';
 import ApiServer from './ApiServer';
-import { ErrorResponse } from './ServerResponseUtils';
 
 export type ServerConfig = {
     port: number;
@@ -21,6 +20,11 @@ export type RequestContext = {
     appConfig: AppConfig;
     request: IncomingMessage;
     body?: Json;
+};
+
+export type ErrorResponse = {
+    status: number;
+    message: string;
 };
 
 export type RequestHandler = {

@@ -1,9 +1,5 @@
 import { ServerResponse } from 'http';
-
-export type ErrorResponse = {
-    status: number;
-    message: string;
-};
+import { ErrorResponse } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isErrorResponse = (candidate: any): candidate is ErrorResponse => {

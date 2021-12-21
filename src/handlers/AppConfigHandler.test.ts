@@ -1,6 +1,6 @@
-import { readTestConfigTmpFileAsJson, removeTestConfigTmpFile, testApiServer } from './TestUtils';
+import { readTestConfigTmpFileAsJson, removeTestConfigTmpFile, testApiServer } from '../utils/TestUtils';
 import { appConfigHandler } from './AppConfigHandler';
-import { AppConfig } from './types';
+import { AppConfig } from '../types';
 
 describe('AppConfigHandler', () => {
     it('handles GET properly', (done) => {
