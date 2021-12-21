@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig } from './AppConfigUtils';
-import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
+import { ErrorResponse, isErrorResponse, writeBadRequest, writeErrorResponse, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
 import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig } from './types';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
@@ -11,35 +11,41 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
         context.body = JSON.parse(bodyBuffer.toString()) as Json;
     }
 
-    let jsonResponse: Json | undefined;
+    let handlerResponse: Json | ErrorResponse | undefined;
     switch (context.request.method) {
         case 'GET':
             if (handler?.get === undefined) {
                 writeMethodNotAllowed(response);
                 return;
             }
-            jsonResponse = handler.get(context);
+            handlerResponse = handler.get(context);
             break;
         case 'POST':
             if (handler?.post === undefined) {
                 writeMethodNotAllowed(response);
                 return;
             }
-            jsonResponse = handler.post(context);
+            handlerResponse = handler.post(context);
             break;
         case 'DELETE':
             if (handler?.delete === undefined) {
                 writeMethodNotAllowed(response);
                 return;
             }
-            jsonResponse = handler.delete(context);
+            handlerResponse = handler.delete(context);
             break;
     }
-    response.writeHead(200, {
-        'Content-Type': 'application/json; charset=UTF-8',
-    });
-    response.write(JSON.stringify(jsonResponse));
-    response.end();
+    if (handlerResponse === undefined) {
+        writeBadRequest(response);
+    } else if (isErrorResponse(handlerResponse)) {
+        writeErrorResponse(response, handlerResponse);
+    } else {
+        response.writeHead(200, {
+            'Content-Type': 'application/json; charset=UTF-8',
+        });
+        response.write(JSON.stringify(handlerResponse));
+        response.end();
+    }
 };
 
 export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {

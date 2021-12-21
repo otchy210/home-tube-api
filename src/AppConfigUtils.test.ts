@@ -1,21 +1,6 @@
 import { execSync } from 'child_process';
 import { DEFAULT_APP_CONFIG, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './AppConfigUtils';
-
-const TEST_CONFIG_PATH = './test/test-config.json';
-export const TEST_CONFIG_TMP_PATH = './tmp/test-config.json';
-
-const TEST_CONFIG = {
-    videoStorages: [
-        {
-            path: '/path/1/',
-            enabled: true,
-        },
-        {
-            path: '/path/2/',
-            enabled: false,
-        },
-    ],
-};
+import { TEST_CONFIG_PATH, TEST_CONFIG, TEST_CONFIG_TMP_PATH } from './TestUtils';
 
 describe('getDefaultAppConfigPath', () => {
     it('returns default file name', () => {

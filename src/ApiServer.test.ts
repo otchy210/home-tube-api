@@ -1,37 +1,10 @@
-import * as request from 'supertest';
 import ApiServer, { handleRequestEnd } from './ApiServer';
-import { unlinkSync } from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { handleRequest } from './ApiServer';
 import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './ServerResponseUtils';
 import { AppConfig, RequestContext, RequestHandler } from './types';
-import { TEST_CONFIG_TMP_PATH } from './AppConfigUtils.test';
 
 jest.mock('./ServerResponseUtils');
-
-const TEST_HTTP_PORT = 12345;
-
-export const testApiServer = (handlers: RequestHandler[], test: (request: request.SuperTest<request.Test>) => request.Test, done: jest.DoneCallback) => {
-    try {
-        unlinkSync(TEST_CONFIG_TMP_PATH);
-    } catch (e) {
-        console.debug(`failed to remove ${TEST_CONFIG_TMP_PATH}`);
-    }
-    const apiServer = new ApiServer({
-        port: TEST_HTTP_PORT,
-        appConfigPath: TEST_CONFIG_TMP_PATH,
-    });
-    handlers.forEach((handler) => {
-        apiServer.registerRequestHandler(handler);
-    });
-    apiServer.start().then((apiServer) => {
-        const httpServer = apiServer.getHttpServer();
-        test(request(httpServer)).end((err) => {
-            apiServer.close();
-            return done(err);
-        });
-    });
-};
 
 describe('handleRequest', () => {
     const mockedApiServer = {} as ApiServer;
