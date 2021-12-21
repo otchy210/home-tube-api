@@ -7,7 +7,7 @@ export const TEST_CONFIG_PATH = './test/test-config.json';
 export const TEST_CONFIG_TMP_PATH = './tmp/test-config.json';
 
 export const TEST_CONFIG = {
-    videoStorages: [
+    storages: [
         {
             path: '/path/1/',
             enabled: true,

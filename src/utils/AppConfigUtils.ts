@@ -11,7 +11,7 @@ export const getDefaultAppConfigPath = (): string => {
 };
 
 export const DEFAULT_APP_CONFIG: AppConfig = {
-    videoStorages: [],
+    storages: [],
 };
 
 export const loadAppConfig = (path: string): AppConfig => {

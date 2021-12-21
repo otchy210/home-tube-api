@@ -12,7 +12,7 @@ describe('AppConfigHandler', () => {
                     .expect(200)
                     .expect((res) => {
                         const body = JSON.parse(res.text);
-                        expect(body.videoStorages.length).toBe(0);
+                        expect(body.storages.length).toBe(0);
                     });
             },
             done
@@ -38,7 +38,7 @@ describe('AppConfigHandler', () => {
             done
         ).then(() => {
             const config = readTestConfigTmpFileAsJson() as AppConfig;
-            expect(config.videoStorages.length).toBe(0);
+            expect(config.storages.length).toBe(0);
             removeTestConfigTmpFile();
         });
     });
@@ -49,15 +49,15 @@ describe('AppConfigHandler', () => {
             (test) => {
                 return test
                     .post('/appConfig')
-                    .send({ videoStorages: [{ path: '/path/1/', enabled: true }] })
+                    .send({ storages: [{ path: '/path/1/', enabled: true }] })
                     .expect(200);
             },
             done
         ).then(() => {
             const config = readTestConfigTmpFileAsJson() as AppConfig;
-            expect(config.videoStorages.length).toBe(1);
-            expect(config.videoStorages[0].path).toBe('/path/1/');
-            expect(config.videoStorages[0].enabled).toBe(true);
+            expect(config.storages.length).toBe(1);
+            expect(config.storages[0].path).toBe('/path/1/');
+            expect(config.storages[0].enabled).toBe(true);
             removeTestConfigTmpFile();
         });
     });

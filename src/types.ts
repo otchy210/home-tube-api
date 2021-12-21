@@ -6,13 +6,13 @@ export type ServerConfig = {
     appConfigPath?: string;
 };
 
-export type VideoStorage = {
+export type Storage = {
     path: string;
     enabled: boolean;
 };
 
 export type AppConfig = {
-    videoStorages: VideoStorage[];
+    storages: Storage[];
 };
 
 export type RequestContext = {

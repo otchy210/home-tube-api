@@ -1,5 +1,5 @@
 {
-  "videoStorages": [
+  "storages": [
     {
       "path": "/path/1/",
       "enabled": true
