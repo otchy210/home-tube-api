@@ -31,17 +31,17 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
     });
 };
 
-type Listener = (added: Set<string>, removed: Set<string>) => void;
+export type StorageListener = (added: Set<string>, removed: Set<string>) => void;
 
-export default class StorageMonitoringWorker {
+export default class StorageMonitor {
     private path: string;
     private intervalInSecond: number;
     private current = new Set<string>();
-    private listener: Listener;
+    private listener: StorageListener;
     private tid: NodeJS.Timeout | undefined;
     private stopped = false;
 
-    public constructor(path: string, intervalInSecond: number, listener: Listener) {
+    public constructor(path: string, intervalInSecond: number, listener: StorageListener) {
         this.path = path;
         this.intervalInSecond = intervalInSecond;
         this.listener = listener;
@@ -60,7 +60,7 @@ export default class StorageMonitoringWorker {
         if (this.stopped) {
             return;
         }
-        this.tid = global.setTimeout(async () => {
+        this.tid = setTimeout(async () => {
             const previous = this.current;
             const current = await this.retrieve();
             const added = new Set(Array.from(current).filter((path) => !previous.has(path)));
@@ -77,9 +77,7 @@ export default class StorageMonitoringWorker {
         return new Promise((resolve) => {
             this.retrieve().then((result) => {
                 this.current = result;
-                if (result.size > 0) {
-                    this.listener(result, new Set());
-                }
+                this.listener(result, new Set());
                 this.monitor();
                 resolve(result);
             });
@@ -90,6 +88,7 @@ export default class StorageMonitoringWorker {
         if (this.tid !== undefined) {
             clearTimeout(this.tid);
         }
+        this.listener(new Set(), this.current);
         this.stopped = true;
     }
 }

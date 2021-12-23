@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import StorageMonitoringWorker, { getExtension, readDir } from './StorageMonitoringWorker';
+import StorageMonitor, { getExtension, readDir } from './StorageMonitor';
 
 describe('getExtension', () => {
     it('works', () => {
@@ -21,7 +21,7 @@ describe('readDir', () => {
     });
 });
 
-describe('StorageMonitoringWorker', () => {
+describe('StorageMonitor', () => {
     beforeAll(() => {
         execSync('mkdir -p tmp/storage1/a/b/a');
         execSync('mkdir -p tmp/storage1/b');
@@ -31,7 +31,7 @@ describe('StorageMonitoringWorker', () => {
 
     it('retrieves initial data', (done) => {
         const listener = jest.fn();
-        const worker = new StorageMonitoringWorker('tmp/storage1', 1, listener);
+        const worker = new StorageMonitor('tmp/storage1', 1, listener);
         worker.start().then((result) => {
             expect(result.size).toBe(2);
             worker.stop();
@@ -41,7 +41,7 @@ describe('StorageMonitoringWorker', () => {
 
     it('monitors file creation and deletion', (done) => {
         const listener = jest.fn();
-        const worker = new StorageMonitoringWorker('tmp/storage1', 0.1, listener);
+        const worker = new StorageMonitor('tmp/storage1', 0.1, listener);
         worker.start().then(() => {
             expect(listener).toBeCalledTimes(1);
             listener.mockReset();
