@@ -3,6 +3,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { handleRequest } from './ApiServer';
 import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
 import { AppConfig, RequestContext, RequestHandler } from './types';
+import * as request from 'supertest';
 
 jest.mock('./utils/ServerResponseUtils');
 
@@ -94,5 +95,29 @@ describe('handleRequest', () => {
             expect(mockedResponse.write).toBeCalledWith('{"result":"ok"}');
             expect(mockedResponse.end).toBeCalledTimes(1);
         });
+    });
+});
+
+describe('ApiServer', () => {
+    const tmpConfig = `tmp/${Math.random().toString(32).substring(2)}/test-config.json`;
+    let apiServer: ApiServer;
+    beforeAll(() => {
+        apiServer = new ApiServer({ port: 12345, appConfigPath: tmpConfig });
+        apiServer.start();
+    });
+    it('returns 404 for unkown path', () => {
+        request(apiServer.getHttpServer()).get('/dummy').expect(404);
+    });
+    it('/appConfig returns default appConfig', () => {
+        request(apiServer.getHttpServer())
+            .get('/appConfig')
+            .expect(200)
+            .expect((res) => {
+                const body = JSON.parse(res.text);
+                expect(body.storages.length).toBe(0);
+            });
+    });
+    afterAll(() => {
+        apiServer.close();
     });
 });

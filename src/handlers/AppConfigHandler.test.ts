@@ -1,64 +1,61 @@
-import { readTestConfigTmpFileAsJson, removeTestConfigTmpFile, testApiServer } from '../utils/TestUtils';
+import { TEST_CONFIG } from '../utils/TestConst';
 import { appConfigHandler } from './AppConfigHandler';
-import { AppConfig } from '../types';
+import { Json, RequestContext } from '../types';
+import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import ApiServer from '../ApiServer';
 
 describe('appConfigHandler', () => {
-    it('handles GET properly', (done) => {
-        testApiServer(
-            [appConfigHandler],
-            (test) => {
-                return test
-                    .get('/appConfig')
-                    .expect(200)
-                    .expect((res) => {
-                        const body = JSON.parse(res.text);
-                        expect(body.storages.length).toBe(0);
-                    });
-            },
-            done
-        );
+    it('handles GET properly', () => {
+        const mockedContext = {
+            appConfig: TEST_CONFIG,
+        } as RequestContext;
+        if (!appConfigHandler.get) {
+            fail('appConfigHandler has to implement get');
+        }
+        expect(appConfigHandler.get(mockedContext)).toStrictEqual(TEST_CONFIG);
     });
 
-    it("returns 400 if POST doesn't have body", (done) => {
-        testApiServer(
-            [appConfigHandler],
-            (test) => {
-                return test.post('/appConfig').expect(400);
-            },
-            done
-        );
-    });
-
-    it('returns 200 and stores default config when POST body is empty', (done) => {
-        testApiServer(
-            [appConfigHandler],
-            (test) => {
-                return test.post('/appConfig').send({}).expect(200);
-            },
-            done
-        ).then(() => {
-            const config = readTestConfigTmpFileAsJson() as AppConfig;
-            expect(config.storages.length).toBe(0);
-            removeTestConfigTmpFile();
+    describe('POST', () => {
+        it("returns 400 if it doesn't have body", () => {
+            if (!appConfigHandler.post) {
+                fail('appConfigHandler has to implement post');
+            }
+            const mockedContext = {} as RequestContext;
+            expect(appConfigHandler.post(mockedContext)).toStrictEqual(BAD_REQUEST);
         });
-    });
 
-    it('returns 200 and stores config properly based on POST body', (done) => {
-        testApiServer(
-            [appConfigHandler],
-            (test) => {
-                return test
-                    .post('/appConfig')
-                    .send({ storages: [{ path: '/path/1/', enabled: true }] })
-                    .expect(200);
-            },
-            done
-        ).then(() => {
-            const config = readTestConfigTmpFileAsJson() as AppConfig;
-            expect(config.storages.length).toBe(1);
-            expect(config.storages[0].path).toBe('/path/1/');
-            expect(config.storages[0].enabled).toBe(true);
-            removeTestConfigTmpFile();
+        it('stores config properly based on body', () => {
+            if (!appConfigHandler.post) {
+                fail('appConfigHandler has to implement post');
+            }
+
+            const mockedApiServer = {
+                saveAppConfig: jest.fn(),
+            } as unknown as ApiServer;
+            const mockedBody = {
+                storages: [
+                    {
+                        path: '/path/to/updated/storage',
+                        enabled: true,
+                    },
+                ],
+            } as Json;
+            const mockedContext = {
+                apiServer: mockedApiServer,
+                appConfig: TEST_CONFIG,
+                body: mockedBody,
+            } as RequestContext;
+
+            appConfigHandler.post(mockedContext);
+
+            expect(mockedApiServer.saveAppConfig).toBeCalledWith({
+                storages: [
+                    {
+                        path: '/path/to/updated/storage',
+                        enabled: true,
+                    },
+                ],
+            });
         });
     });
 });

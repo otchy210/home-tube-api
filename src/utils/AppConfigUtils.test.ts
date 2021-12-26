@@ -1,7 +1,8 @@
 import { execSync } from 'child_process';
+import { unlinkSync } from 'fs';
 import { setTimeout } from 'timers';
 import { DEFAULT_APP_CONFIG, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './AppConfigUtils';
-import { TEST_CONFIG_PATH, TEST_CONFIG, TEST_CONFIG_TMP_PATH, removeTestConfigTmpFile } from './TestUtils';
+import { TEST_CONFIG_PATH, TEST_CONFIG } from './TestConst';
 
 describe('getDefaultAppConfigPath', () => {
     it('returns default file name', () => {
@@ -21,10 +22,12 @@ describe('loadAppConfig', () => {
 
 describe('saveAppConfig', () => {
     it('saves app config file properly', (done) => {
-        removeTestConfigTmpFile();
-        saveAppConfig(TEST_CONFIG_TMP_PATH, TEST_CONFIG);
+        const tmpConfig = `tmp/${Math.random().toString(32).substring(2)}.json`;
+
+        saveAppConfig(tmpConfig, TEST_CONFIG);
         setTimeout(() => {
-            expect(execSync(`diff ${TEST_CONFIG_PATH} ${TEST_CONFIG_TMP_PATH}`).toString()).toBe('');
+            expect(execSync(`diff ${TEST_CONFIG_PATH} ${tmpConfig}`).toString()).toBe('');
+            unlinkSync(tmpConfig);
             done();
         }, 100);
     });
