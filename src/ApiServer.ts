@@ -1,51 +1,84 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
-import { isErrorResponse, writeBadRequest, writeErrorResponse, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
-import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig } from './types';
+import {
+    isErrorResponse,
+    writeBadRequest,
+    writeErrorResponse,
+    writeInternalServerError,
+    writeMethodNotAllowed,
+    writeNotFound,
+} from './utils/ServerResponseUtils';
+import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig, RequestParams } from './types';
 import { appConfigHandler } from './handlers/AppConfigHandler';
+import { searchHandler } from './handlers/SearchHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
-export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler, bodyChunks: Array<Uint8Array>) => {
-    if (bodyChunks.length > 0) {
-        const bodyBuffer = Buffer.concat(bodyChunks);
-        context.body = JSON.parse(bodyBuffer.toString()) as Json;
+export const parseUrl = (url: string): { urlPath: string; params?: RequestParams } => {
+    const charIndex = url.indexOf('?');
+    if (charIndex < 0) {
+        return { urlPath: url };
     }
+    const urlPath = url.substring(0, charIndex);
+    const params = url
+        .substring(charIndex + 1)
+        .split('&')
+        .map((pairStr) => pairStr.split('='))
+        .reduce<RequestParams>((map, [key, value]) => {
+            if (map[key] !== undefined) {
+                throw new Error(`Duplicate param name is not allowed: ${key}`);
+            }
+            try {
+                map[key] = JSON.parse(value);
+            } catch {
+                // treat all parse errors as string value
+                map[key] = value;
+            }
+            return map;
+        }, {});
+    return { urlPath, params };
+};
 
+export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler) => {
     let handlerResponse: Json | ErrorResponse | undefined;
-    switch (context.request.method) {
-        case 'GET':
-            if (handler?.get === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            handlerResponse = handler.get(context);
-            break;
-        case 'POST':
-            if (handler?.post === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            handlerResponse = handler.post(context);
-            break;
-        case 'DELETE':
-            if (handler?.delete === undefined) {
-                writeMethodNotAllowed(response);
-                return;
-            }
-            handlerResponse = handler.delete(context);
-            break;
-    }
-    if (handlerResponse === undefined) {
-        writeBadRequest(response);
-    } else if (isErrorResponse(handlerResponse)) {
-        writeErrorResponse(response, handlerResponse);
-    } else {
-        response.writeHead(200, {
-            'Content-Type': 'application/json; charset=UTF-8',
-        });
-        response.write(JSON.stringify(handlerResponse));
-        response.end();
+    try {
+        switch (context.request.method) {
+            case 'GET':
+                if (handler?.get === undefined) {
+                    writeMethodNotAllowed(response);
+                    return;
+                }
+                handlerResponse = handler.get(context);
+                break;
+            case 'POST':
+                if (handler?.post === undefined) {
+                    writeMethodNotAllowed(response);
+                    return;
+                }
+                handlerResponse = handler.post(context);
+                break;
+            case 'DELETE':
+                if (handler?.delete === undefined) {
+                    writeMethodNotAllowed(response);
+                    return;
+                }
+                handlerResponse = handler.delete(context);
+                break;
+        }
+        if (handlerResponse === undefined) {
+            writeBadRequest(response);
+        } else if (isErrorResponse(handlerResponse)) {
+            writeErrorResponse(response, handlerResponse);
+        } else {
+            response.writeHead(200, {
+                'Content-Type': 'application/json; charset=UTF-8',
+            });
+            response.write(JSON.stringify(handlerResponse));
+            response.end();
+        }
+    } catch (e) {
+        console.error(e);
+        writeInternalServerError(response);
     }
 };
 
@@ -63,23 +96,31 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
         writeNotFound(response);
         return;
     }
-    // TODO: need to parse params
-    if (!requestHandlers.has(url)) {
+
+    const urlParams = parseUrl(url);
+    const handler = requestHandlers.get(urlParams.urlPath);
+    if (!handler) {
         writeNotFound(response);
         return;
     }
-    const handler = requestHandlers.get(url) as RequestHandler;
+    if (urlParams.params) {
+        context.params = urlParams.params;
+    }
 
     const bodyChunks = new Array<Uint8Array>();
     context.request.on('data', (chunk) => {
         bodyChunks.push(chunk);
     });
     context.request.on('end', () => {
-        handleRequestEnd(context, response, handler, bodyChunks);
+        if (bodyChunks.length > 0) {
+            const bodyBuffer = Buffer.concat(bodyChunks);
+            context.body = JSON.parse(bodyBuffer.toString()) as Json;
+        }
+        handleRequestEnd(context, response, handler);
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler];
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler];
 
 export default class ApiServer {
     private port: number;

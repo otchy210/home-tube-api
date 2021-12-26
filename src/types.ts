@@ -15,10 +15,15 @@ export type AppConfig = {
     storages: Storage[];
 };
 
+export type RequestParams = {
+    [key: string]: Json;
+};
+
 export type RequestContext = {
     apiServer: ApiServer;
     appConfig: AppConfig;
     request: IncomingMessage;
+    params?: RequestParams;
     body?: Json;
 };
 

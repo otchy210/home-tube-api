@@ -26,6 +26,11 @@ export const METHOD_NOT_ALLOWED = {
     message: 'Method Not Allowed',
 } as ErrorResponse;
 
+export const INTERNAL_SERVER_ERROR = {
+    status: 500,
+    message: 'Internal Server Error',
+} as ErrorResponse;
+
 export const writeErrorResponse = (res: ServerResponse, errorResponse: ErrorResponse): void => {
     res.writeHead(errorResponse.status, errorResponse.message);
     res.end();
@@ -41,4 +46,8 @@ export const writeNotFound = (res: ServerResponse): void => {
 
 export const writeMethodNotAllowed = (res: ServerResponse): void => {
     writeErrorResponse(res, METHOD_NOT_ALLOWED);
+};
+
+export const writeInternalServerError = (res: ServerResponse): void => {
+    writeErrorResponse(res, INTERNAL_SERVER_ERROR);
 };

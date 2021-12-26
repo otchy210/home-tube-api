@@ -1,10 +1,26 @@
-import ApiServer, { handleRequestEnd } from './ApiServer';
+import ApiServer, { handleRequestEnd, parseUrl } from './ApiServer';
 import { IncomingMessage, ServerResponse } from 'http';
 import { handleRequest } from './ApiServer';
 import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
 import { AppConfig, RequestContext, RequestHandler } from './types';
 
 jest.mock('./utils/ServerResponseUtils');
+
+describe('parseUrl', () => {
+    it('works', () => {
+        expect(parseUrl('/noparams')).toStrictEqual({
+            urlPath: '/noparams',
+        });
+        expect(parseUrl('/single?a=1')).toStrictEqual({
+            urlPath: '/single',
+            params: { a: 1 },
+        });
+        expect(parseUrl('/multiple?a=1&b=true&c=str&d=[1,2,3,4]')).toStrictEqual({
+            urlPath: '/multiple',
+            params: { a: 1, b: true, c: 'str', d: [1, 2, 3, 4] },
+        });
+    });
+});
 
 describe('handleRequest', () => {
     const mockedApiServer = {} as ApiServer;
@@ -56,9 +72,8 @@ describe('handleRequest', () => {
             const mockedContext = { ...defaultMockedContext, request: { method, url: '/path', ...defaultMockedRequest } } as RequestContext;
             const mockedResponse = {} as ServerResponse;
             const mockedRequestHandler = {} as RequestHandler;
-            const mockedBodyChunks = [] as Array<Uint8Array>;
 
-            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler, mockedBodyChunks);
+            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
 
             expect(mockedWriteMethodNotAllowed).toBeCalledTimes(1);
         });
@@ -72,9 +87,8 @@ describe('handleRequest', () => {
             const mockedRequestHandler = {
                 get: jest.fn().mockReturnValue({ result: 'ok' }),
             } as unknown as RequestHandler;
-            const mockedBodyChunks = [] as Array<Uint8Array>;
 
-            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler, mockedBodyChunks);
+            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
 
             expect(mockedResponse.writeHead).toBeCalledWith(200, expect.any(Object));
             expect(mockedResponse.write).toBeCalledWith('{"result":"ok"}');

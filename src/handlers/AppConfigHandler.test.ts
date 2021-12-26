@@ -2,7 +2,7 @@ import { readTestConfigTmpFileAsJson, removeTestConfigTmpFile, testApiServer } f
 import { appConfigHandler } from './AppConfigHandler';
 import { AppConfig } from '../types';
 
-describe('AppConfigHandler', () => {
+describe('appConfigHandler', () => {
     it('handles GET properly', (done) => {
         testApiServer(
             [appConfigHandler],
