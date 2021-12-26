@@ -1,4 +1,4 @@
-import VideoCollection from '../storages/VideoCollection';
+import VideoCollection from '../videos/VideoCollection';
 import { RequestHandler } from '../types';
 
 export const searchHandler: RequestHandler = {

@@ -11,8 +11,8 @@ import {
 import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage } from './types';
 import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
-import { StorageManager } from './storages/StorageManager';
-import VideoCollection from './storages/VideoCollection';
+import { StorageManager } from './videos/StorageManager';
+import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
