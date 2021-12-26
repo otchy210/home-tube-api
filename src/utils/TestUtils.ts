@@ -32,18 +32,18 @@ export const readTestConfigTmpFileAsJson = (): Json => {
 };
 
 export const testApiServer = (
-    handlers: RequestHandler[],
+    requestHandlers: RequestHandler[],
     test: (request: request.SuperTest<request.Test>) => request.Test,
     done: jest.DoneCallback
 ): Promise<void> => {
     removeTestConfigTmpFile();
-    const apiServer = new ApiServer({
-        port: TEST_HTTP_PORT,
-        appConfigPath: TEST_CONFIG_TMP_PATH,
-    });
-    handlers.forEach((handler) => {
-        apiServer.registerRequestHandler(handler);
-    });
+    const apiServer = new ApiServer(
+        {
+            port: TEST_HTTP_PORT,
+            appConfigPath: TEST_CONFIG_TMP_PATH,
+        },
+        requestHandlers
+    );
     return new Promise((resolve) => {
         apiServer.start().then((apiServer) => {
             const httpServer = apiServer.getHttpServer();

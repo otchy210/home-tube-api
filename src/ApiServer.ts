@@ -1,7 +1,8 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
-import { getDefaultAppConfigPath, loadAppConfig } from './utils/AppConfigUtils';
+import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
 import { isErrorResponse, writeBadRequest, writeErrorResponse, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
 import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig } from './types';
+import { appConfigHandler } from './handlers/AppConfigHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -78,6 +79,8 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler];
+
 export default class ApiServer {
     private port: number;
     private appConfigPath: string;
@@ -85,10 +88,17 @@ export default class ApiServer {
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
 
-    public constructor(serverConfig: ServerConfig) {
+    public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
         this.port = serverConfig.port;
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
+        requestHandlers.forEach((requestHandler) => {
+            const { path } = requestHandler;
+            if (this.requestHandlers.has(path)) {
+                throw new Error(`Request path has been registered: ${path}`);
+            }
+            this.requestHandlers.set(path, requestHandler);
+        });
         this.httpServer = createServer(this.requestListener);
     }
 
@@ -100,17 +110,15 @@ export default class ApiServer {
         return this.appConfig;
     }
 
+    public saveAppConfig(updatedAppConfig: AppConfig): AppConfig {
+        this.appConfig = updatedAppConfig;
+        saveAppConfig(this.appConfigPath, updatedAppConfig);
+        return updatedAppConfig;
+    }
+
     public getHttpServer(): HttpServer {
         return this.httpServer;
     }
-
-    public registerRequestHandler = (requestHandler: RequestHandler): void => {
-        const { path } = requestHandler;
-        if (this.requestHandlers.has(path)) {
-            throw new Error(`Request path has been registered: ${path}`);
-        }
-        this.requestHandlers.set(path, requestHandler);
-    };
 
     public start(): Promise<ApiServer> {
         return new Promise((resolve) => {

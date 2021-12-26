@@ -1,4 +1,3 @@
-import { saveAppConfig } from '../utils/AppConfigUtils';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { RequestHandler } from '../types';
 
@@ -12,7 +11,6 @@ export const appConfigHandler: RequestHandler = {
             return BAD_REQUEST;
         }
         const updatedAppConfig = { ...appConfig, ...(body as object) };
-        saveAppConfig(apiServer.getAppConfigPath(), updatedAppConfig);
-        return updatedAppConfig;
+        return apiServer.saveAppConfig(updatedAppConfig);
     },
 };
