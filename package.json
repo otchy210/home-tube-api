@@ -1,18 +1,18 @@
 {
   "name": "@otchy/home-tube-api",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "API Server for HomeTube",
-  "type": "module",
   "main": "dist/index.js",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist/* && tsc",
     "test": "jest",
     "lint": "eslint src/*",
     "lint:fix": "eslint --fix src/*",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "start": "npm run build && node bin/start.js"
   },
   "repository": {
     "type": "git",
