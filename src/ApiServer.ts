@@ -8,9 +8,12 @@ import {
     writeMethodNotAllowed,
     writeNotFound,
 } from './utils/ServerResponseUtils';
-import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig, RequestParams } from './types';
+import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage } from './types';
 import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
+import { StorageManager } from './storages/StorageManager';
+import VideoCollection from './storages/VideoCollection';
+import logger from './utils/logger';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -77,7 +80,7 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
             response.end();
         }
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         writeInternalServerError(response);
     }
 };
@@ -128,11 +131,13 @@ export default class ApiServer {
     private appConfig: AppConfig;
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
+    private storageManager = new StorageManager();
 
     public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
         this.port = serverConfig.port;
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
+        this.updateStorages([], this.appConfig.storages);
         requestHandlers.forEach((requestHandler) => {
             const { path } = requestHandler;
             if (this.requestHandlers.has(path)) {
@@ -152,6 +157,8 @@ export default class ApiServer {
     }
 
     public saveAppConfig(updatedAppConfig: AppConfig): AppConfig {
+        const current = this.appConfig.storages;
+        this.updateStorages(current, updatedAppConfig.storages);
         this.appConfig = updatedAppConfig;
         saveAppConfig(this.appConfigPath, updatedAppConfig);
         return updatedAppConfig;
@@ -166,6 +173,42 @@ export default class ApiServer {
             this.httpServer.listen(this.port, () => {
                 resolve(this);
             });
+        });
+    }
+
+    private createStorageListener(): (added: Set<string>, removed: Set<string>) => void {
+        return (added, removed) => {
+            removed.forEach((path) => {
+                VideoCollection.remove(path);
+            });
+            added.forEach((path) => {
+                VideoCollection.add(path);
+            });
+        };
+    }
+
+    private updateStorages(current: Storage[], updated: Storage[]) {
+        const currentMap = current.reduce((map, curr) => {
+            map.set(curr.path, curr);
+            return map;
+        }, new Map<string, Storage>());
+        const updatedMap = updated.reduce((map, curr) => {
+            map.set(curr.path, curr);
+            return map;
+        }, new Map<string, Storage>());
+
+        // check removed or disabled
+        currentMap.forEach((currentStorage, path) => {
+            if (currentStorage.enabled && !updatedMap.get(path)?.enabled) {
+                this.storageManager.remove(path);
+            }
+        });
+
+        // check added or enabled
+        updatedMap.forEach((updatedStorage, path) => {
+            if (updatedStorage.enabled && !currentMap.get(path)?.enabled) {
+                this.storageManager.add(path, this.createStorageListener());
+            }
         });
     }
 

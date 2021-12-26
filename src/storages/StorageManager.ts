@@ -1,11 +1,13 @@
+import logger from '../utils/logger';
 import StorageMonitor, { StorageListener } from './StorageMonitor';
 
-const MONITOR_INTERVAL = 60;
+const MONITOR_INTERVAL = 10 * 60; // 10 mins
 
 export class StorageManager {
     private monitorMap = new Map<string, StorageMonitor>();
 
     public add(path: string, storageListener: StorageListener): void {
+        logger.debug('StorageManager.add', path);
         if (this.monitorMap.has(path)) {
             return;
         }
@@ -15,6 +17,7 @@ export class StorageManager {
     }
 
     public remove(path: string) {
+        logger.debug('StorageManager.remove', path);
         if (!this.monitorMap.has(path)) {
             return;
         }
