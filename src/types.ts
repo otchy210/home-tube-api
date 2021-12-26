@@ -48,3 +48,11 @@ type JsonObject = {
 };
 
 export type Json = JsonPrimitive | JsonArray | JsonObject;
+
+export type VideoMeta = {
+    duration?: string;
+    length?: number;
+    codec?: string;
+    width?: number;
+    height?: number;
+};
