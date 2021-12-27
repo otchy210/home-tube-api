@@ -5,17 +5,27 @@ describe('FFmpeg', () => {
     describe('getMeta', () => {
         it('works', () => {
             expect(ffmpeg.getMeta('test/test-movie.mp4')).toStrictEqual({
-                codec: 'h264',
-                duration: '4',
+                acodec: 'aac',
+                vcodec: 'h264',
+                duration: '3',
                 height: 1080,
-                length: 4,
+                length: 3.08,
+                width: 1920,
+            });
+            expect(ffmpeg.getMeta('test/test-movie.avi')).toStrictEqual({
+                acodec: 'mp3',
+                vcodec: 'mpeg4',
+                duration: '3',
+                height: 1080,
+                length: 3.1,
                 width: 1920,
             });
             expect(ffmpeg.getMeta('test/test-movie.wmv')).toStrictEqual({
-                codec: 'msmpeg4v3',
-                duration: '4',
+                acodec: 'wmav2',
+                vcodec: 'msmpeg4v3',
+                duration: '3',
                 height: 1080,
-                length: 4,
+                length: 3.14,
                 width: 1920,
             });
         });

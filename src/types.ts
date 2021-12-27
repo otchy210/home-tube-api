@@ -52,7 +52,8 @@ export type Json = JsonPrimitive | JsonArray | JsonObject;
 export type VideoMeta = {
     duration?: string;
     length?: number;
-    codec?: string;
+    vcodec?: string;
     width?: number;
     height?: number;
+    acodec?: string;
 };

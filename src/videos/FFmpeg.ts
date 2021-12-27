@@ -23,12 +23,17 @@ const formatDuration = (duration: string): string => {
     return result;
 };
 
-const parseMetaVideo = (line: string): { codec: string; width: number; height: number } => {
-    const codec = line.trim().split(' ')[3];
+const parseMetaVideo = (line: string): { vcodec: string; width: number; height: number } => {
+    const vcodec = line.trim().split(' ')[3];
     const match = /, ([\d]{2,4})x([\d]{2,4})/.exec(line) as RegExpExecArray;
     const width = parseInt(match[1]);
     const height = parseInt(match[2]);
-    return { codec, width, height };
+    return { vcodec, width, height };
+};
+
+const parseMetaAudio = (line: string): { acodec: string } => {
+    const acodec = line.trim().split(' ')[3];
+    return { acodec };
 };
 
 export default class FFmpeg {
@@ -43,13 +48,17 @@ export default class FFmpeg {
         const results = execSync(command).toString();
         let metaDuration = {};
         let metaVideo = {};
+        let metaAudio = {};
+        console.log(results);
         results.split('\n').forEach((line) => {
             if (line.includes('  Duration: ')) {
                 metaDuration = parseMetaDuration(line);
             } else if (line.includes(': Video: ')) {
                 metaVideo = parseMetaVideo(line);
+            } else if (line.includes(': Audio: ')) {
+                metaAudio = parseMetaAudio(line);
             }
         });
-        return { ...metaDuration, ...metaVideo };
+        return { ...metaDuration, ...metaVideo, ...metaAudio };
     }
 }
