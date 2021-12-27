@@ -1,15 +1,16 @@
-import MetaManager, { stopMonitoring } from './MetaManager';
+import MetaManager from './MetaManager';
 
 describe('MetaManager', () => {
+    const metaManager = new MetaManager();
     describe('get', () => {
         it('returns only name if there is no meta.json', (done) => {
-            MetaManager.get('test/test-movie.wmv', false).then((meta) => {
+            metaManager.get('test/test-movie.wmv', false).then((meta) => {
                 expect(meta).toStrictEqual({ name: 'test-movie.wmv' });
                 done();
             });
         });
         it('reads meta.json properly if exists', (done) => {
-            MetaManager.get('test/test-movie.mp4', false).then((meta) => {
+            metaManager.get('test/test-movie.mp4', false).then((meta) => {
                 expect(meta).toStrictEqual({
                     acodec: 'aac',
                     duration: '3',
@@ -25,6 +26,6 @@ describe('MetaManager', () => {
     });
 
     afterAll(() => {
-        stopMonitoring();
+        metaManager.stopMonitoring();
     });
 });

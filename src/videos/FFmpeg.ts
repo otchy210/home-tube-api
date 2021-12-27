@@ -39,7 +39,7 @@ const parseMetaAudio = (line: string): { acodec: string } => {
 export default class FFmpeg {
     private ffmpeg: string;
 
-    constructor(ffmpeg = '') {
+    constructor(ffmpeg?: string) {
         this.ffmpeg = ffmpeg || getFFmpeg();
     }
 

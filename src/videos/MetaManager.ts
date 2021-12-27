@@ -15,37 +15,51 @@ type Request = {
     metaDir: string;
     metaFile: string;
 };
-const ffmpeg = new FFmpeg();
-const queue: Request[] = [];
-const enqueue = (request: Request): void => {
-    queue.push(request);
-};
-let tid: NodeJS.Timeout;
-export const stopMonitoring = () => {
-    clearTimeout(tid);
-};
-const check = async () => {
-    stopMonitoring();
-    const request = queue.shift();
-    if (!request) {
-        tid = setTimeout(check, MONITOR_INTERVAL);
-        return;
-    }
-    const { path, name, metaDir, metaFile } = request;
-    await mkdir(metaDir, { recursive: true });
-    const videoMeta = ffmpeg.getMeta(path);
-    videoMeta.name = name;
-    await writeFile(metaFile, JSON.stringify(videoMeta));
-    check();
-};
-check();
 
-const MetaManager = {
+export default class MetaManager {
+    private ffmpeg;
+    private queue: Request[] = [];
+    private tid: NodeJS.Timeout | undefined;
+
+    constructor(ffmpeg?: string) {
+        this.ffmpeg = new FFmpeg(ffmpeg);
+        this.check();
+    }
+
+    public enqueue(request: Request): void {
+        this.queue.push(request);
+    }
+
+    public getQueue() {
+        return this.queue;
+    }
+
+    private check = async () => {
+        this.stopMonitoring();
+        const request = this.queue.shift();
+        if (!request) {
+            this.tid = setTimeout(this.check, MONITOR_INTERVAL);
+            return;
+        }
+        const { path, name, metaDir, metaFile } = request;
+        await mkdir(metaDir, { recursive: true });
+        const videoMeta = this.ffmpeg.getMeta(path);
+        videoMeta.name = name;
+        await writeFile(metaFile, JSON.stringify(videoMeta));
+        this.check();
+    };
+
+    public stopMonitoring = () => {
+        if (this.tid !== undefined) {
+            clearTimeout(this.tid);
+        }
+    };
+
     /**
      * It returns VideoMeta if meta file exists.
      * Otherwize return only name but enqueue data retrieving job
      */
-    get: (path: string, queueIfNoMetaData = true): Promise<VideoMeta> => {
+    public get(path: string, queueIfNoMetaData = true): Promise<VideoMeta> {
         const name = basename(path);
         const hashedName = hash(name);
         const dir = dirname(path);
@@ -58,20 +72,18 @@ const MetaManager = {
                 })
                 .catch(() => {
                     if (queueIfNoMetaData) {
-                        enqueue({
+                        this.enqueue({
                             path,
                             name,
                             metaDir,
                             metaFile,
                         });
-                        check();
+                        this.check();
                     }
                     resolve({
                         name,
                     });
                 });
         });
-    },
-};
-
-export default MetaManager;
+    }
+}

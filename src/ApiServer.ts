@@ -14,6 +14,7 @@ import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
 import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
+import MetaManager from './videos/MetaManager';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -132,12 +133,15 @@ export default class ApiServer {
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
     private storageManager = new StorageManager();
+    private metaManager: MetaManager;
 
     public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
         this.port = serverConfig.port;
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
         this.updateStorages([], this.appConfig.storages);
+        this.metaManager = new MetaManager(this.appConfig.ffmpeg);
+
         requestHandlers.forEach((requestHandler) => {
             const { path } = requestHandler;
             if (this.requestHandlers.has(path)) {
@@ -145,20 +149,31 @@ export default class ApiServer {
             }
             this.requestHandlers.set(path, requestHandler);
         });
-        this.httpServer = createServer(this.requestListener);
+
+        this.httpServer = createServer((request: IncomingMessage, response: ServerResponse): void => {
+            const context = {
+                apiServer: this,
+                appConfig: this.appConfig,
+                metaManager: this.metaManager,
+                request,
+            } as RequestContext;
+            handleRequest(context, response, this.requestHandlers);
+        });
     }
 
     public getAppConfigPath(): string {
         return this.appConfigPath;
     }
 
-    public getAppConfig(): AppConfig {
-        return this.appConfig;
-    }
-
     public saveAppConfig(updatedAppConfig: AppConfig): AppConfig {
-        const current = this.appConfig.storages;
-        this.updateStorages(current, updatedAppConfig.storages);
+        const currentStorages = this.appConfig.storages;
+        this.updateStorages(currentStorages, updatedAppConfig.storages);
+        if (this.appConfig.ffmpeg !== updatedAppConfig.ffmpeg) {
+            this.metaManager.stopMonitoring();
+            const currentQueue = this.metaManager.getQueue();
+            this.metaManager = new MetaManager(updatedAppConfig.ffmpeg);
+            currentQueue.forEach((request) => this.metaManager.enqueue(request));
+        }
         this.appConfig = updatedAppConfig;
         saveAppConfig(this.appConfigPath, updatedAppConfig);
         return updatedAppConfig;
@@ -183,6 +198,7 @@ export default class ApiServer {
             });
             added.forEach((path) => {
                 VideoCollection.add(path);
+                this.metaManager.get(path);
             });
         };
     }
@@ -211,15 +227,6 @@ export default class ApiServer {
             }
         });
     }
-
-    private requestListener = (request: IncomingMessage, response: ServerResponse): void => {
-        const context = {
-            apiServer: this,
-            appConfig: this.appConfig,
-            request,
-        } as RequestContext;
-        handleRequest(context, response, this.requestHandlers);
-    };
 
     public close(): ApiServer {
         this.httpServer.close();

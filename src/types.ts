@@ -1,5 +1,6 @@
 import { IncomingMessage } from 'http';
 import ApiServer from './ApiServer';
+import MetaManager from './videos/MetaManager';
 
 export type ServerConfig = {
     port: number;
@@ -13,6 +14,7 @@ export type Storage = {
 
 export type AppConfig = {
     storages: Storage[];
+    ffmpeg?: string;
 };
 
 export type RequestParams = {
@@ -22,6 +24,7 @@ export type RequestParams = {
 export type RequestContext = {
     apiServer: ApiServer;
     appConfig: AppConfig;
+    metaManager: MetaManager;
     request: IncomingMessage;
     params?: RequestParams;
     body?: Json;
