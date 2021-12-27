@@ -50,6 +50,7 @@ type JsonObject = {
 export type Json = JsonPrimitive | JsonArray | JsonObject;
 
 export type VideoMeta = {
+    name?: string;
     duration?: string;
     length?: number;
     vcodec?: string;

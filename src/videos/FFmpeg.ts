@@ -49,7 +49,6 @@ export default class FFmpeg {
         let metaDuration = {};
         let metaVideo = {};
         let metaAudio = {};
-        console.log(results);
         results.split('\n').forEach((line) => {
             if (line.includes('  Duration: ')) {
                 metaDuration = parseMetaDuration(line);
