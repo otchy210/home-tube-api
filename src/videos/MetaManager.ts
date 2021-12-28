@@ -3,6 +3,7 @@ import { basename, dirname, join } from 'path';
 import { VideoMeta } from '../types';
 import { hash } from '../utils/StringUtils';
 import FFmpeg from './FFmpeg';
+import VideoCollection from './VideoCollection';
 
 const META_DIR = '.home-tube';
 const META_FILE = 'meta.json';
@@ -43,9 +44,10 @@ export default class MetaManager {
         }
         const { path, name, metaDir, metaFile } = request;
         await mkdir(metaDir, { recursive: true });
-        const videoMeta = this.ffmpeg.getMeta(path);
-        videoMeta.name = name;
-        await writeFile(metaFile, JSON.stringify(videoMeta));
+        const meta = this.ffmpeg.getMeta(path);
+        meta.name = name;
+        await writeFile(metaFile, JSON.stringify(meta));
+        VideoCollection.updateMeta(path, meta);
         this.check();
     };
 
@@ -68,7 +70,9 @@ export default class MetaManager {
         return new Promise((resolve) => {
             readFile(metaFile)
                 .then((buf) => {
-                    resolve(JSON.parse(buf.toString()));
+                    const meta = JSON.parse(buf.toString());
+                    VideoCollection.updateMeta(path, meta);
+                    resolve(meta);
                 })
                 .catch(() => {
                     if (queueIfNoMetaData) {

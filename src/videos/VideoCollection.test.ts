@@ -27,6 +27,7 @@ describe('VideoCollection', () => {
         expect(results.size).toBe(1);
         expect(Array.from(results)[0].values).toStrictEqual({
             path: '/path/to/日本語動画.mp4',
+            name: '日本語動画.mp4',
             names: ['path', 'to', '日本語動画'],
         });
     });
