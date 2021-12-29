@@ -1,19 +1,26 @@
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
+import { join } from 'path';
 import { VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
-import FFmpegWorker, { FFmpegRequest } from './FFmpegWorker';
+import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import VideoCollection from './VideoCollection';
+
+const META_FILE = 'meta.json';
+
+const getMetaFile = (metaDir: string): string => {
+    return join(metaDir, META_FILE);
+};
 
 export default class MetaManager extends FFmpegWorker {
     constructor(ffmpeg?: string) {
         super(ffmpeg);
     }
 
-    async consume(request: FFmpegRequest): Promise<void> {
-        const { path, name, metaDir, metaFile } = request;
-        await mkdir(metaDir, { recursive: true });
+    async consume({ path, name, metaDir }: ConsumeParams): Promise<void> {
         const meta = this.ffmpeg.getMeta(path);
         meta.name = name;
+
+        const metaFile = getMetaFile(metaDir);
         await writeFile(metaFile, JSON.stringify(meta));
         VideoCollection.updateMeta(path, meta);
     }
@@ -23,7 +30,8 @@ export default class MetaManager extends FFmpegWorker {
      * Otherwize returns only name but enqueue data retrieving job
      */
     public get(path: string, enqueueIfNoMetaData = true): Promise<VideoMeta> {
-        const { name, metaDir, metaFile } = parsePath(path);
+        const { name, metaDir } = parsePath(path);
+        const metaFile = getMetaFile(metaDir);
         return new Promise((resolve) => {
             readFile(metaFile)
                 .then((buf) => {
@@ -35,9 +43,6 @@ export default class MetaManager extends FFmpegWorker {
                     if (enqueueIfNoMetaData) {
                         this.enqueue({
                             path,
-                            name,
-                            metaDir,
-                            metaFile,
                         });
                         this.check();
                     }

@@ -48,7 +48,7 @@ const THUMBNAIL_TMP_DIR = 'home-tube';
 const THUMBNAIL_SIZE = 240;
 const THUMBNAIL_ROW_SIZE = 30;
 const THUMBNAIL_JPEG_QUALITY = 5;
-const THUMBNAILS_NAME = 'thumbnails.jpg';
+export const THUMBNAILS_NAME = 'thumbnails.jpg';
 
 export default class FFmpeg {
     private ffmpeg: string;

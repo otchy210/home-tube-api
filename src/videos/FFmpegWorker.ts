@@ -1,12 +1,17 @@
+import { mkdir } from 'fs/promises';
+import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';
 
 const MONITOR_INTERVAL = 1000 * 60; // 1 minute
 
 export type FFmpegRequest = {
     path: string;
+};
+
+export type ConsumeParams = {
+    path: string;
     name: string;
     metaDir: string;
-    metaFile: string;
 };
 
 export default abstract class FFmpegWorker {
@@ -34,12 +39,21 @@ export default abstract class FFmpegWorker {
             this.tid = setTimeout(this.check, MONITOR_INTERVAL);
             return;
         }
-        this.consume(request).then(() => {
-            this.check();
+        const { path } = request;
+        const { name, metaDir } = parsePath(path);
+        mkdir(metaDir, { recursive: true }).then(() => {
+            const params = {
+                path,
+                name,
+                metaDir,
+            };
+            this.consume(params).then(() => {
+                this.check();
+            });
         });
     }
 
-    abstract consume(request: FFmpegRequest): Promise<void>;
+    abstract consume(request: ConsumeParams): Promise<void>;
 
     public stopMonitoring(): void {
         if (this.tid !== undefined) {
