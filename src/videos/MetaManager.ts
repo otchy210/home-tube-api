@@ -1,57 +1,22 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
-import FFmpeg from './FFmpeg';
+import FFmpegWorker, { FFmpegRequest } from './FFmpegWorker';
 import VideoCollection from './VideoCollection';
 
-const MONITOR_INTERVAL = 1000 * 60; // 1 minute
-
-type Request = {
-    path: string;
-    name: string;
-    metaDir: string;
-    metaFile: string;
-};
-
-export default class MetaManager {
-    private ffmpeg;
-    private queue: Request[] = [];
-    private tid: NodeJS.Timeout | undefined;
-
+export default class MetaManager extends FFmpegWorker {
     constructor(ffmpeg?: string) {
-        this.ffmpeg = new FFmpeg(ffmpeg);
-        this.check();
+        super(ffmpeg);
     }
 
-    public enqueue(request: Request): void {
-        this.queue.push(request);
-    }
-
-    public getQueue() {
-        return this.queue;
-    }
-
-    private check = async () => {
-        this.stopMonitoring();
-        const request = this.queue.shift();
-        if (!request) {
-            this.tid = setTimeout(this.check, MONITOR_INTERVAL);
-            return;
-        }
+    async consume(request: FFmpegRequest): Promise<void> {
         const { path, name, metaDir, metaFile } = request;
         await mkdir(metaDir, { recursive: true });
         const meta = this.ffmpeg.getMeta(path);
         meta.name = name;
         await writeFile(metaFile, JSON.stringify(meta));
         VideoCollection.updateMeta(path, meta);
-        this.check();
-    };
-
-    public stopMonitoring = () => {
-        if (this.tid !== undefined) {
-            clearTimeout(this.tid);
-        }
-    };
+    }
 
     /**
      * Returns full VideoMeta if meta file exists.
