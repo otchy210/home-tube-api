@@ -1,12 +1,8 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { basename, dirname, join } from 'path';
 import { VideoMeta } from '../types';
-import { hash } from '../utils/StringUtils';
+import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';
 import VideoCollection from './VideoCollection';
-
-const META_DIR = '.home-tube';
-const META_FILE = 'meta.json';
 
 const MONITOR_INTERVAL = 1000 * 60; // 1 minute
 
@@ -58,15 +54,11 @@ export default class MetaManager {
     };
 
     /**
-     * It returns VideoMeta if meta file exists.
-     * Otherwize return only name but enqueue data retrieving job
+     * Returns full VideoMeta if meta file exists.
+     * Otherwize returns only name but enqueue data retrieving job
      */
-    public get(path: string, queueIfNoMetaData = true): Promise<VideoMeta> {
-        const name = basename(path);
-        const hashedName = hash(name);
-        const dir = dirname(path);
-        const metaDir = join(dir, META_DIR, hashedName);
-        const metaFile = join(metaDir, META_FILE);
+    public get(path: string, enqueueIfNoMetaData = true): Promise<VideoMeta> {
+        const { name, metaDir, metaFile } = parsePath(path);
         return new Promise((resolve) => {
             readFile(metaFile)
                 .then((buf) => {
@@ -75,7 +67,7 @@ export default class MetaManager {
                     resolve(meta);
                 })
                 .catch(() => {
-                    if (queueIfNoMetaData) {
+                    if (enqueueIfNoMetaData) {
                         this.enqueue({
                             path,
                             name,
