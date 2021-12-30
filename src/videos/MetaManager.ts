@@ -11,7 +11,7 @@ const getMetaFile = (metaDir: string): string => {
     return join(metaDir, META_FILE);
 };
 
-export default class MetaManager extends FFmpegWorker {
+class MetaManager extends FFmpegWorker {
     constructor(ffmpeg?: string) {
         super(ffmpeg);
     }
@@ -53,3 +53,27 @@ export default class MetaManager extends FFmpegWorker {
         });
     }
 }
+
+let instance: MetaManager;
+
+export const initialize = (ffmpeg?: string): void => {
+    instance = new MetaManager(ffmpeg);
+};
+
+export const reinstantiate = (ffmpeg?: string): void => {
+    if (instance === undefined) {
+        throw new Error('MetaManager is not initialized');
+    }
+    const current = instance;
+    current.stopMonitoring();
+    const currentQueue = current.getQueue();
+    instance = new MetaManager(ffmpeg);
+    currentQueue.forEach((request) => instance.enqueue(request));
+};
+
+export const useMetaManager = (): MetaManager => {
+    if (instance === undefined) {
+        throw new Error('MetaManager is not initialized');
+    }
+    return instance;
+};

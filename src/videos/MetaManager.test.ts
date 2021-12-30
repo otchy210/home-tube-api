@@ -1,7 +1,8 @@
-import MetaManager from './MetaManager';
+import { initialize, useMetaManager } from './MetaManager';
 
 describe('MetaManager', () => {
-    const metaManager = new MetaManager();
+    initialize();
+    const metaManager = useMetaManager();
     describe('get', () => {
         it('returns only name if there is no meta.json', (done) => {
             metaManager.get('test/test-movie.wmv', false).then((meta) => {

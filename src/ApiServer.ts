@@ -14,7 +14,7 @@ import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
 import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
-import MetaManager from './videos/MetaManager';
+import { initialize as initializeMataManager, reinstantiate as reinstantiateMetaManager, useMetaManager } from './videos/MetaManager';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -133,14 +133,13 @@ export default class ApiServer {
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
     private storageManager = new StorageManager();
-    private metaManager: MetaManager;
 
     public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
         this.port = serverConfig.port;
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
+        initializeMataManager(this.appConfig.ffmpeg);
         this.updateStorages([], this.appConfig.storages);
-        this.metaManager = new MetaManager(this.appConfig.ffmpeg);
 
         requestHandlers.forEach((requestHandler) => {
             const { path } = requestHandler;
@@ -154,7 +153,6 @@ export default class ApiServer {
             const context = {
                 apiServer: this,
                 appConfig: this.appConfig,
-                metaManager: this.metaManager,
                 request,
             } as RequestContext;
             handleRequest(context, response, this.requestHandlers);
@@ -169,10 +167,7 @@ export default class ApiServer {
         const currentStorages = this.appConfig.storages;
         this.updateStorages(currentStorages, updatedAppConfig.storages);
         if (this.appConfig.ffmpeg !== updatedAppConfig.ffmpeg) {
-            this.metaManager.stopMonitoring();
-            const currentQueue = this.metaManager.getQueue();
-            this.metaManager = new MetaManager(updatedAppConfig.ffmpeg);
-            currentQueue.forEach((request) => this.metaManager.enqueue(request));
+            reinstantiateMetaManager(updatedAppConfig.ffmpeg);
         }
         this.appConfig = updatedAppConfig;
         saveAppConfig(this.appConfigPath, updatedAppConfig);
@@ -192,13 +187,14 @@ export default class ApiServer {
     }
 
     private createStorageListener(): (added: Set<string>, removed: Set<string>) => void {
+        const metaManager = useMetaManager();
         return (added, removed) => {
             removed.forEach((path) => {
                 VideoCollection.remove(path);
             });
             added.forEach((path) => {
                 VideoCollection.add(path);
-                this.metaManager.get(path);
+                metaManager.get(path);
             });
         };
     }

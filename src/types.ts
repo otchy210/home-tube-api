@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http';
 import ApiServer from './ApiServer';
-import MetaManager from './videos/MetaManager';
 
 export type ServerConfig = {
     port: number;
@@ -24,7 +23,6 @@ export type RequestParams = {
 export type RequestContext = {
     apiServer: ApiServer;
     appConfig: AppConfig;
-    metaManager: MetaManager;
     request: IncomingMessage;
     params?: RequestParams;
     body?: Json;
@@ -60,4 +58,11 @@ export type VideoMeta = {
     width?: number;
     height?: number;
     acodec?: string;
+};
+
+export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta> => {
+    if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec) {
+        return true;
+    }
+    return false;
 };
