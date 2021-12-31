@@ -1,3 +1,7 @@
+import { existsSync, rmdirSync, unlinkSync } from 'fs';
+import { join } from 'path';
+import { isRequiredVideoMeta } from '../types';
+import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';
 
 describe('FFmpeg', () => {
@@ -10,6 +14,7 @@ describe('FFmpeg', () => {
                 duration: '3',
                 height: 1080,
                 length: 3.08,
+                name: 'test-movie.mp4',
                 width: 1920,
             });
             expect(ffmpeg.getMeta('test/test-movie.avi')).toStrictEqual({
@@ -18,6 +23,7 @@ describe('FFmpeg', () => {
                 duration: '3',
                 height: 1080,
                 length: 3.1,
+                name: 'test-movie.avi',
                 width: 1920,
             });
             expect(ffmpeg.getMeta('test/test-movie.wmv')).toStrictEqual({
@@ -26,7 +32,26 @@ describe('FFmpeg', () => {
                 duration: '3',
                 height: 1080,
                 length: 3.14,
+                name: 'test-movie.wmv',
                 width: 1920,
+            });
+        });
+    });
+
+    describe('createThumbnails', () => {
+        it('works', (done) => {
+            const path = 'test/test-movie.wmv';
+            const meta = ffmpeg.getMeta(path);
+            if (!isRequiredVideoMeta(meta)) {
+                throw new Error();
+            }
+            ffmpeg.createThumbnails(path, meta).then(() => {
+                const { metaDir } = parsePath(path);
+                const thumbnailsPath = join(metaDir, 'thumbnails_000.jpg');
+                expect(existsSync(thumbnailsPath)).toBe(true);
+                unlinkSync(thumbnailsPath);
+                rmdirSync(metaDir);
+                done();
             });
         });
     });

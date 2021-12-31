@@ -17,15 +17,14 @@ class MetaManager extends FFmpegWorker {
         super(ffmpeg);
     }
 
-    async consume({ path, name, metaDir }: ConsumeParams): Promise<void> {
+    async consume({ path, metaDir }: ConsumeParams): Promise<void> {
         const meta = this.ffmpeg.getMeta(path);
-        meta.name = name;
 
         const metaFile = getMetaFile(metaDir);
         await writeFile(metaFile, JSON.stringify(meta));
         VideoCollection.updateMeta(path, meta);
         // generate thumbnails
-        useThumbnailsManager().get(path);
+        useThumbnailsManager().get(path, 0);
     }
 
     /**
@@ -41,7 +40,7 @@ class MetaManager extends FFmpegWorker {
                     const meta = JSON.parse(buf.toString());
                     VideoCollection.updateMeta(path, meta);
                     // generate thumbnails as needed
-                    useThumbnailsManager().get(path);
+                    useThumbnailsManager().get(path, 0);
                     resolve(meta);
                 })
                 .catch(() => {

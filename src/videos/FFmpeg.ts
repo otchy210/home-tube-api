@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import { copyFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
 import { parsePath } from '../utils/PathUtils';
@@ -48,7 +48,10 @@ const THUMBNAIL_TMP_DIR = 'home-tube';
 const THUMBNAIL_SIZE = 240;
 const THUMBNAIL_ROW_SIZE = 60;
 const THUMBNAIL_JPEG_QUALITY = 5;
-export const THUMBNAILS_NAME = 'thumbnails.jpg';
+
+export const getThumbnailsName = (index: number): string => {
+    return `thumbnails_${String(index).padStart(3, '0')}.jpg`;
+};
 
 export default class FFmpeg {
     private ffmpeg: string;
@@ -74,7 +77,8 @@ export default class FFmpeg {
                 metaAudio = parseMetaAudio(line);
             }
         });
-        return { ...metaDuration, ...metaVideo, ...metaAudio };
+        const name = basename(path);
+        return { name, ...metaDuration, ...metaVideo, ...metaAudio };
     }
 
     public createThumbnails(path: string, meta: Required<VideoMeta>): Promise<boolean> {
@@ -92,38 +96,37 @@ export default class FFmpeg {
                 await execPromise(thumbnailsCommand).catch((error) => {
                     console.error(error);
                 });
-                let rows = 1;
+                let rows = 0;
+                const outputFiles: string[] = [];
                 for (let i = 1; i < length; i += THUMBNAIL_ROW_SIZE) {
                     const inputPaths: string[] = [];
                     for (let r = 0; r < THUMBNAIL_ROW_SIZE; r++) {
-                        const count = i + r < length ? i + r : 1; // padding tail with 00001.png
+                        const count = i + r;
+                        if (count >= length) {
+                            break;
+                        }
                         const inputPath = join(tmpDir, `${String(count).padStart(4, '0')}.png`);
                         inputPaths.push(inputPath);
                     }
                     const inputPathsCommand = inputPaths.map((inputPath) => `-i "${inputPath}"`).join(' ');
-                    const outputFile = join(tmpDir, `hstack_${rows}.png`);
-                    const hstackCommand = `${this.ffmpeg} ${inputPathsCommand} -filter_complex hstack=inputs=${inputPaths.length} ${outputFile}`;
+                    const outputFile = getThumbnailsName(rows);
+                    const outputPath = join(tmpDir, outputFile);
+                    const hstackCommand = `${this.ffmpeg} ${inputPathsCommand} -filter_complex hstack=inputs=${inputPaths.length} -qscale ${THUMBNAIL_JPEG_QUALITY} ${outputPath}`;
                     await execPromise(hstackCommand).catch((error) => {
                         console.error(error);
                     });
+                    outputFiles.push(outputFile);
                     rows++;
                 }
-                const inputPaths: string[] = [];
-                for (let r = 1; r < rows; r++) {
-                    const inputPath = join(tmpDir, `hstack_${r}.png`);
-                    inputPaths.push(inputPath);
-                }
-                const inputPathsCommand = inputPaths.map((inputPath) => `-i "${inputPath}"`).join(' ');
-                const outputFile = join(tmpDir, THUMBNAILS_NAME);
-                const vstackCommand = `${this.ffmpeg} ${inputPathsCommand} -filter_complex vstack=inputs=${inputPaths.length} -qscale ${THUMBNAIL_JPEG_QUALITY} ${outputFile}`;
-                await execPromise(vstackCommand).catch((error) => {
-                    console.error(error);
-                });
                 const { metaDir } = parsePath(path);
                 await mkdir(metaDir, { recursive: true });
-                await copyFile(outputFile, join(metaDir, THUMBNAILS_NAME)).catch((error) => {
-                    console.error(error);
-                });
+                for (const file of outputFiles) {
+                    const srcPath = join(tmpDir, file);
+                    const destPath = join(metaDir, file);
+                    await copyFile(srcPath, destPath).catch((error) => {
+                        console.error(error);
+                    });
+                }
                 resolve(true);
             })();
         });

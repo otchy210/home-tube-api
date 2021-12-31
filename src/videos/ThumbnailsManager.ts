@@ -2,12 +2,12 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
-import { THUMBNAILS_NAME } from './FFmpeg';
+import { getThumbnailsName } from './FFmpeg';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { useMetaManager } from './MetaManager';
 
-const getThumbnailsFile = (metaDir: string): string => {
-    return join(metaDir, THUMBNAILS_NAME);
+const getThumbnailsPath = (metaDir: string, minute: number): string => {
+    return join(metaDir, getThumbnailsName(minute));
 };
 
 type ThumbnailsStatus = 'PROCESSING';
@@ -24,14 +24,17 @@ class ThumbnailsManager extends FFmpegWorker {
         if (status === 'PROCESSING') {
             return;
         }
-        const thumbnailsFile = getThumbnailsFile(metaDir);
-        if (existsSync(thumbnailsFile)) {
-            return;
-        }
         const metaManager = useMetaManager();
         const meta = await metaManager.get(path);
         if (!isRequiredVideoMeta(meta)) {
             return;
+        }
+        const minutes = Math.ceil(meta.length / 60);
+        for (let minute = 0; minute < minutes; minute++) {
+            const thumbnailsPath = getThumbnailsPath(metaDir, minute);
+            if (!existsSync(thumbnailsPath)) {
+                return;
+            }
         }
         this.statuses.set(path, 'PROCESSING');
         await this.ffmpeg.createThumbnails(path, meta);
@@ -40,15 +43,15 @@ class ThumbnailsManager extends FFmpegWorker {
 
     /**
      * Returns thumbnails path if thumbnails file exists.
-     * Otherwize returns empty string but enqueue data processing job
+     * Otherwize returns empty string but enqueue data processing job (when minute === 0)
      */
-    public get(path: string, enqueueIfNoThumbnails = true): string {
+    public get(path: string, minute: number, enqueueIfNoThumbnails = true): string {
         const { metaDir } = parsePath(path);
-        const thumbnailsFile = getThumbnailsFile(metaDir);
-        if (existsSync(thumbnailsFile)) {
-            return thumbnailsFile;
+        const thumbnailsPath = getThumbnailsPath(metaDir, minute);
+        if (existsSync(thumbnailsPath)) {
+            return thumbnailsPath;
         }
-        if (enqueueIfNoThumbnails) {
+        if (minute === 0 && enqueueIfNoThumbnails) {
             this.enqueue({ path });
         }
         return '';
