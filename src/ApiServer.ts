@@ -17,6 +17,7 @@ import logger from './utils/logger';
 import { initializeWorkers, reinstantiateWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
 import { useThumbnailsManager } from './videos/ThumbnailsManager';
+import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -126,7 +127,7 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler];
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler];
 
 export default class ApiServer {
     private port: number;

@@ -60,6 +60,9 @@ const fields: Field[] = [
 const collection = new Collection(fields);
 
 const VideoCollection = {
+    get: (id: number): Document => {
+        return collection.get(id);
+    },
     add: (path: string) => {
         const name = basename(path);
         const names = parsePath(path);
