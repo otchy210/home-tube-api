@@ -3,6 +3,7 @@ import { copyFile, mkdir } from 'fs/promises';
 import { basename, join } from 'path';
 import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
+import logger from '../utils/logger';
 import { parsePath } from '../utils/PathUtils';
 
 const getFFmpeg = (): string => {
@@ -94,7 +95,7 @@ export default class FFmpeg {
                 const outputPath = join(tmpDir, '%04d.png');
                 const thumbnailsCommand = `${this.ffmpeg} -i "${path}" -vf scale=${scale},fps=1 "${outputPath}"`;
                 await execPromise(thumbnailsCommand).catch((error) => {
-                    console.error(error);
+                    logger.error(error);
                 });
                 let rows = 0;
                 const outputFiles: string[] = [];
@@ -113,7 +114,7 @@ export default class FFmpeg {
                     const outputPath = join(tmpDir, outputFile);
                     const hstackCommand = `${this.ffmpeg} ${inputPathsCommand} -filter_complex hstack=inputs=${inputPaths.length} -qscale ${THUMBNAIL_JPEG_QUALITY} ${outputPath}`;
                     await execPromise(hstackCommand).catch((error) => {
-                        console.error(error);
+                        logger.error(error);
                     });
                     outputFiles.push(outputFile);
                     rows++;
@@ -124,7 +125,7 @@ export default class FFmpeg {
                     const srcPath = join(tmpDir, file);
                     const destPath = join(metaDir, file);
                     await copyFile(srcPath, destPath).catch((error) => {
-                        console.error(error);
+                        logger.error(error);
                     });
                 }
                 resolve(true);

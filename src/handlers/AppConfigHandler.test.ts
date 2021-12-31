@@ -10,7 +10,7 @@ describe('appConfigHandler', () => {
             appConfig: TEST_CONFIG,
         } as RequestContext;
         if (!appConfigHandler.get) {
-            fail('appConfigHandler has to implement get');
+            fail();
         }
         expect(appConfigHandler.get(mockedContext)).toStrictEqual(TEST_CONFIG);
     });
