@@ -1,6 +1,5 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import { getThumbnailsName } from './FFmpeg';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
@@ -25,16 +24,21 @@ class ThumbnailsManager extends FFmpegWorker {
             return;
         }
         const metaManager = useMetaManager();
-        const meta = await metaManager.get(path);
-        if (!isRequiredVideoMeta(meta)) {
+        const meta = metaManager.getRequiredMeta(path);
+        if (!meta) {
             return;
         }
         const minutes = Math.ceil(meta.length / 60);
+        let existsAll = true;
         for (let minute = 0; minute < minutes; minute++) {
             const thumbnailsPath = getThumbnailsPath(metaDir, minute);
             if (!existsSync(thumbnailsPath)) {
-                return;
+                existsAll = false;
+                break;
             }
+        }
+        if (existsAll) {
+            return;
         }
         this.statuses.set(path, 'PROCESSING');
         await this.ffmpeg.createThumbnails(path, meta);

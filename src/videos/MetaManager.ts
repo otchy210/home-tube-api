@@ -1,6 +1,7 @@
+import { existsSync, readFileSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { VideoMeta } from '../types';
+import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { useThumbnailsManager } from './ThumbnailsManager';
@@ -8,7 +9,7 @@ import VideoCollection from './VideoCollection';
 
 const META_FILE = 'meta.json';
 
-const getMetaFile = (metaDir: string): string => {
+const getMetaPath = (metaDir: string): string => {
     return join(metaDir, META_FILE);
 };
 
@@ -20,8 +21,8 @@ class MetaManager extends FFmpegWorker {
     async consume({ path, metaDir }: ConsumeParams): Promise<void> {
         const meta = this.ffmpeg.getMeta(path);
 
-        const metaFile = getMetaFile(metaDir);
-        await writeFile(metaFile, JSON.stringify(meta));
+        const metaPath = getMetaPath(metaDir);
+        await writeFile(metaPath, JSON.stringify(meta));
         VideoCollection.updateMeta(path, meta);
         // generate thumbnails
         useThumbnailsManager().get(path, 0);
@@ -33,9 +34,9 @@ class MetaManager extends FFmpegWorker {
      */
     public get(path: string, enqueueIfNoMetaData = true): Promise<VideoMeta> {
         const { name, metaDir } = parsePath(path);
-        const metaFile = getMetaFile(metaDir);
+        const metaPath = getMetaPath(metaDir);
         return new Promise((resolve) => {
-            readFile(metaFile)
+            readFile(metaPath)
                 .then((buf) => {
                     const meta = JSON.parse(buf.toString());
                     VideoCollection.updateMeta(path, meta);
@@ -54,6 +55,23 @@ class MetaManager extends FFmpegWorker {
                     });
                 });
         });
+    }
+
+    /**
+     * Trys loading meta file synchronously and return it if exists.
+     * Otherwize, returns undefined
+     */
+    public getRequiredMeta(path: string): Required<VideoMeta> | undefined {
+        const { metaDir } = parsePath(path);
+        const metaPath = getMetaPath(metaDir);
+        if (!existsSync(metaPath)) {
+            return;
+        }
+        const meta = JSON.parse(readFileSync(metaPath).toString()) as VideoMeta;
+        if (!isRequiredVideoMeta(meta)) {
+            return;
+        }
+        return meta;
     }
 }
 

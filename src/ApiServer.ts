@@ -196,6 +196,7 @@ export default class ApiServer {
             });
             added.forEach((path) => {
                 VideoCollection.add(path);
+                // try updating meta
                 metaManager.get(path);
             });
         };
