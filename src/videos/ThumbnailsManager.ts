@@ -50,7 +50,6 @@ class ThumbnailsManager extends FFmpegWorker {
         }
         if (enqueueIfNoThumbnails) {
             this.enqueue({ path });
-            this.check();
         }
         return '';
     }

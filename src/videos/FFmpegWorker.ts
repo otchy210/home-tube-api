@@ -2,7 +2,7 @@ import { mkdir } from 'fs/promises';
 import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';
 
-const MONITOR_INTERVAL = 1000 * 60; // 1 minute
+const MONITOR_INTERVAL = 1000 * 10; // 10 seconds
 
 export type FFmpegRequest = {
     path: string;
@@ -36,7 +36,9 @@ export default abstract class FFmpegWorker {
         this.stopMonitoring();
         const request = this.queue.shift();
         if (!request) {
-            this.tid = setTimeout(this.check, MONITOR_INTERVAL);
+            this.tid = setTimeout(() => {
+                this.check();
+            }, MONITOR_INTERVAL);
             return;
         }
         const { path } = request;

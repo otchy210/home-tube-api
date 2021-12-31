@@ -46,7 +46,7 @@ const parseMetaAudio = (line: string): { acodec: string } => {
 
 const THUMBNAIL_TMP_DIR = 'home-tube';
 const THUMBNAIL_SIZE = 240;
-const THUMBNAIL_ROW_SIZE = 30;
+const THUMBNAIL_ROW_SIZE = 60;
 const THUMBNAIL_JPEG_QUALITY = 5;
 export const THUMBNAILS_NAME = 'thumbnails.jpg';
 

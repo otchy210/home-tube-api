@@ -3,6 +3,7 @@ import { join } from 'path';
 import { VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
+import { useThumbnailsManager } from './ThumbnailsManager';
 import VideoCollection from './VideoCollection';
 
 const META_FILE = 'meta.json';
@@ -23,6 +24,8 @@ class MetaManager extends FFmpegWorker {
         const metaFile = getMetaFile(metaDir);
         await writeFile(metaFile, JSON.stringify(meta));
         VideoCollection.updateMeta(path, meta);
+        // generate thumbnails
+        useThumbnailsManager().get(path);
     }
 
     /**
@@ -37,6 +40,8 @@ class MetaManager extends FFmpegWorker {
                 .then((buf) => {
                     const meta = JSON.parse(buf.toString());
                     VideoCollection.updateMeta(path, meta);
+                    // generate thumbnails as needed
+                    useThumbnailsManager().get(path);
                     resolve(meta);
                 })
                 .catch(() => {
@@ -44,7 +49,6 @@ class MetaManager extends FFmpegWorker {
                         this.enqueue({
                             path,
                         });
-                        this.check();
                     }
                     resolve({
                         name,
