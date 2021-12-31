@@ -14,8 +14,9 @@ import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
 import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
-import { initialize as initializeMataManager, reinstantiate as reinstantiateMetaManager, useMetaManager } from './videos/MetaManager';
-import { initialize as initializeThumbnailsManager, reinstantiate as reinstantiateThumbnailsManager, useThumbnailsManager } from './videos/ThumbnailsManager';
+import { initializeWorkers, reinstantiateWorkers } from './videos/FFmpegWorkersManager';
+import { useMetaManager } from './videos/MetaManager';
+import { useThumbnailsManager } from './videos/ThumbnailsManager';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -139,8 +140,7 @@ export default class ApiServer {
         this.port = serverConfig.port;
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
-        initializeMataManager(this.appConfig.ffmpeg);
-        initializeThumbnailsManager(this.appConfig.ffmpeg);
+        initializeWorkers(this.appConfig.ffmpeg);
         this.updateStorages([], this.appConfig.storages);
 
         requestHandlers.forEach((requestHandler) => {
@@ -169,8 +169,7 @@ export default class ApiServer {
         const currentStorages = this.appConfig.storages;
         this.updateStorages(currentStorages, updatedAppConfig.storages);
         if (this.appConfig.ffmpeg !== updatedAppConfig.ffmpeg) {
-            reinstantiateMetaManager(updatedAppConfig.ffmpeg);
-            reinstantiateThumbnailsManager(updatedAppConfig.ffmpeg);
+            reinstantiateWorkers(updatedAppConfig.ffmpeg);
         }
         this.appConfig = updatedAppConfig;
         saveAppConfig(this.appConfigPath, updatedAppConfig);

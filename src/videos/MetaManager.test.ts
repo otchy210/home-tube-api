@@ -1,7 +1,8 @@
-import { initialize, useMetaManager } from './MetaManager';
+import { initializeWorkers, stopWorkers } from './FFMpegWorkersManager';
+import { useMetaManager } from './MetaManager';
 
 describe('MetaManager', () => {
-    initialize();
+    initializeWorkers();
     const metaManager = useMetaManager();
     describe('get', () => {
         it('returns only name if there is no meta.json', (done) => {
@@ -27,6 +28,6 @@ describe('MetaManager', () => {
     });
 
     afterAll(() => {
-        metaManager.stopMonitoring();
+        stopWorkers();
     });
 });

@@ -1,8 +1,10 @@
-import { initialize, useThumbnailsManager } from './ThumbnailsManager';
+import { initializeWorkers, stopWorkers } from './FFMpegWorkersManager';
+import { useThumbnailsManager } from './ThumbnailsManager';
 
 describe('ThumbnailsManager', () => {
-    initialize();
+    initializeWorkers();
     const thumbnailsManager = useThumbnailsManager();
+
     describe('get', () => {
         it('returns empty string if there is no thumbnails file', () => {
             expect(thumbnailsManager.get('test/test-movie.wmv', false)).toBe('');
@@ -13,6 +15,6 @@ describe('ThumbnailsManager', () => {
     });
 
     afterAll(() => {
-        thumbnailsManager.stopMonitoring();
+        stopWorkers();
     });
 });
