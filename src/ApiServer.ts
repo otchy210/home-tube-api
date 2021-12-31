@@ -15,6 +15,7 @@ import { StorageManager } from './videos/StorageManager';
 import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
 import { initialize as initializeMataManager, reinstantiate as reinstantiateMetaManager, useMetaManager } from './videos/MetaManager';
+import { initialize as initializeThumbnailsManager, reinstantiate as reinstantiateThumbnailsManager, useThumbnailsManager } from './videos/ThumbnailsManager';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -139,6 +140,7 @@ export default class ApiServer {
         this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
         initializeMataManager(this.appConfig.ffmpeg);
+        initializeThumbnailsManager(this.appConfig.ffmpeg);
         this.updateStorages([], this.appConfig.storages);
 
         requestHandlers.forEach((requestHandler) => {
@@ -168,6 +170,7 @@ export default class ApiServer {
         this.updateStorages(currentStorages, updatedAppConfig.storages);
         if (this.appConfig.ffmpeg !== updatedAppConfig.ffmpeg) {
             reinstantiateMetaManager(updatedAppConfig.ffmpeg);
+            reinstantiateThumbnailsManager(updatedAppConfig.ffmpeg);
         }
         this.appConfig = updatedAppConfig;
         saveAppConfig(this.appConfigPath, updatedAppConfig);
@@ -225,6 +228,10 @@ export default class ApiServer {
     }
 
     public close(): ApiServer {
+        const metaManager = useMetaManager();
+        const thumbnailsManager = useThumbnailsManager();
+        metaManager.stopMonitoring();
+        thumbnailsManager.stopMonitoring();
         this.httpServer.close();
         return this;
     }
