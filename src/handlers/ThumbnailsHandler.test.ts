@@ -1,9 +1,9 @@
 import { RequestContext, RequestParams } from '../types';
 import { BAD_REQUEST, NOT_FOUND } from '../utils/ServerResponseUtils';
 import { thumbnailsHandler } from './ThumbnailsHandler';
-import VideoCollection from '../videos/VideoCollection';
 import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
+import { useVideoCollection } from '../videos/VideoCollection';
 
 describe('ThumbnailsHandler', () => {
     beforeAll(() => {
@@ -57,7 +57,8 @@ describe('ThumbnailsHandler', () => {
             if (!thumbnailsHandler.get) {
                 fail();
             }
-            const mockedGet = jest.spyOn(VideoCollection, 'get');
+            const videoCollection = useVideoCollection();
+            const mockedGet = jest.spyOn(videoCollection, 'get');
             mockedGet.mockReturnValue({
                 id: 0,
                 values: {
@@ -76,7 +77,8 @@ describe('ThumbnailsHandler', () => {
             if (!thumbnailsHandler.get) {
                 fail();
             }
-            const mockedGetVideo = jest.spyOn(VideoCollection, 'get');
+            const videoCollection = useVideoCollection();
+            const mockedGetVideo = jest.spyOn(videoCollection, 'get');
             mockedGetVideo.mockReturnValue({
                 id: 0,
                 values: {

@@ -3,8 +3,6 @@ import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
 import { basename } from 'path';
 import { VideoMeta } from '../types';
 
-const DELIM = /[/\\]+/;
-
 type LengthTag = {
     length: number;
     tag: string;
@@ -31,9 +29,11 @@ const SIZE_TAGS: SizeTag[] = [
     { size: 7680, tag: '8k', label: '8K (~7680×4320)' },
 ];
 
-export const parsePath = (path: string): string[] => {
+const PATH_DELIM = /[/\\]+/;
+
+export const getNames = (path: string): string[] => {
     return path
-        .split(DELIM)
+        .split(PATH_DELIM)
         .filter((name) => {
             return !(name.length === 0 || name === '.' || name === '..');
         })
@@ -57,21 +57,21 @@ const fields: Field[] = [
     { name: 'size', type: 'tag', indexed: true },
 ];
 
-const collection = new Collection(fields);
+class VideoCollection {
+    private collection = new Collection(fields);
 
-const VideoCollection = {
-    get: (id: number): Document => {
-        return collection.get(id);
-    },
-    add: (path: string) => {
+    public get(id: number): Document {
+        return this.collection.get(id);
+    }
+    public add(path: string) {
         const name = basename(path);
-        const names = parsePath(path);
-        collection.add({
+        const names = getNames(path);
+        this.collection.add({
             values: { path, name, names },
         });
-    },
-    updateMeta: (path: string, meta: VideoMeta) => {
-        const results = collection.find({ path });
+    }
+    public updateMeta(path: string, meta: VideoMeta) {
+        const results = this.collection.find({ path });
         if (results.size === 0) {
             return;
         }
@@ -98,17 +98,22 @@ const VideoCollection = {
                 }
             }
         }
-        collection.update(doc);
-    },
-    remove: (path: string) => {
-        collection.removeMatched({ path });
-    },
-    find: (query: Query): Set<Document> => {
-        return collection.find(query);
-    },
-    size: (): number => {
-        return collection.size;
-    },
-};
+        this.collection.update(doc);
+    }
+    // updateProperties
+    public remove(path: string) {
+        this.collection.removeMatched({ path });
+    }
+    public find(query: Query): Set<Document> {
+        return this.collection.find(query);
+    }
+    public size(): number {
+        return this.collection.size;
+    }
+}
 
-export default VideoCollection;
+const instance = new VideoCollection();
+
+export const useVideoCollection = (): VideoCollection => {
+    return instance;
+};

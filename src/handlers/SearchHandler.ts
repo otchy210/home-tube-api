@@ -1,9 +1,9 @@
-import VideoCollection from '../videos/VideoCollection';
 import { RequestHandler } from '../types';
 import { Query } from '@otchy/sim-doc-db/dist/types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import { useVideoCollection } from '../videos/VideoCollection';
 
-const ALLOWED_SEARCH_PARAMS = ['names', 'length', 'size'];
+const ALLOWED_SEARCH_PARAMS = new Set<string>(['names', 'length', 'size']);
 
 export const searchHandler: RequestHandler = {
     path: '/search',
@@ -11,12 +11,13 @@ export const searchHandler: RequestHandler = {
         if (!params) {
             return BAD_REQUEST;
         }
-        for (const allowedParam of ALLOWED_SEARCH_PARAMS) {
-            if (!params[allowedParam]) {
+        for (const param of Object.keys(params)) {
+            if (!ALLOWED_SEARCH_PARAMS.has(param)) {
                 return BAD_REQUEST;
             }
         }
-        const results = VideoCollection.find(params as Query);
+        const videoCollection = useVideoCollection();
+        const results = videoCollection.find(params as Query);
         return Array.from(results);
     },
 };

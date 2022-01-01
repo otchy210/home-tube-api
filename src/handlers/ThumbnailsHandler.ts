@@ -2,7 +2,7 @@ import { RequestHandler } from '../types';
 import logger from '../utils/logger';
 import { BAD_REQUEST, NOT_FOUND } from '../utils/ServerResponseUtils';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
-import VideoCollection from '../videos/VideoCollection';
+import { useVideoCollection } from '../videos/VideoCollection';
 
 export const thumbnailsHandler: RequestHandler = {
     path: '/thumbnails',
@@ -14,9 +14,10 @@ export const thumbnailsHandler: RequestHandler = {
         if (typeof id !== 'number' || typeof minute !== 'number') {
             return BAD_REQUEST;
         }
+        const videoCollection = useVideoCollection();
         let video;
         try {
-            video = VideoCollection.get(id);
+            video = videoCollection.get(id);
         } catch (e) {
             logger.info(`Video not found: ${id}`);
             return BAD_REQUEST;

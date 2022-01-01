@@ -12,12 +12,12 @@ import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerC
 import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
-import VideoCollection from './videos/VideoCollection';
 import logger from './utils/logger';
 import { initializeWorkers, reinstantiateWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
 import { useThumbnailsManager } from './videos/ThumbnailsManager';
 import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
+import { useVideoCollection } from './videos/VideoCollection';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -191,12 +191,13 @@ export default class ApiServer {
 
     private createStorageListener(): (added: Set<string>, removed: Set<string>) => void {
         const metaManager = useMetaManager();
+        const videoCollection = useVideoCollection();
         return (added, removed) => {
             removed.forEach((path) => {
-                VideoCollection.remove(path);
+                videoCollection.remove(path);
             });
             added.forEach((path) => {
-                VideoCollection.add(path);
+                videoCollection.add(path);
                 // try updating meta
                 metaManager.get(path);
             });
