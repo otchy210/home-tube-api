@@ -18,8 +18,7 @@ export const loadAppConfig = (path: string): AppConfig => {
     if (!existsSync(path)) {
         return DEFAULT_APP_CONFIG;
     }
-    const savedConfigJson = readFileSync(path).toString();
-    const savedConfig = JSON.parse(savedConfigJson) as AppConfig;
+    const savedConfig = JSON.parse(readFileSync(path).toString()) as AppConfig;
     return { ...DEFAULT_APP_CONFIG, ...savedConfig };
 };
 

@@ -1,7 +1,7 @@
 import { Collection } from '@otchy/sim-doc-db';
 import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
 import { basename } from 'path';
-import { VideoMeta } from '../types';
+import { VideoMeta, VideoProperties } from '../types';
 
 type LengthTag = {
     length: number;
@@ -55,6 +55,8 @@ const fields: Field[] = [
     { name: 'width', type: 'number', indexed: false },
     { name: 'height', type: 'number', indexed: false },
     { name: 'size', type: 'tag', indexed: true },
+    { name: 'stars', type: 'number[]', indexed: true },
+    { name: 'tags', type: 'tags', indexed: true },
 ];
 
 class VideoCollection {
@@ -100,8 +102,24 @@ class VideoCollection {
         }
         this.collection.update(doc);
     }
-    // updateProperties
-    public remove(path: string) {
+    public updateProperties(path: string, properties: VideoProperties) {
+        const results = this.collection.find({ path });
+        if (results.size === 0) {
+            return;
+        }
+        const doc = results.values().next().value as Document;
+        if (properties.stars) {
+            const stars: number[] = [];
+            for (let s = 1; s <= properties.stars; s++) {
+                stars.push(s);
+            }
+            doc.values.stars = stars;
+        }
+        if (properties.tags) {
+            doc.values.tags = properties.tags;
+        }
+    }
+    public remove(path: string): void {
         this.collection.removeMatched({ path });
     }
     public find(query: Query): Set<Document> {

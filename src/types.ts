@@ -66,3 +66,10 @@ export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta
     }
     return false;
 };
+
+export type Stars = 1 | 2 | 3 | 4 | 5;
+
+export type VideoProperties = {
+    stars?: Stars;
+    tags?: string[];
+};
