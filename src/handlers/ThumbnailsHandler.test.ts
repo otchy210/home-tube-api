@@ -10,25 +10,6 @@ describe('ThumbnailsHandler', () => {
         initializeWorkers();
     });
     describe('get', () => {
-        it('returns BAD_REQUEST when no params', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
-            const mockedContext = {} as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
-        });
-        it('returns BAD_REQUEST when param id is not number', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
-            const mockedContext = {
-                params: {
-                    id: 'string',
-                    minute: 0,
-                } as RequestParams,
-            } as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
-        });
         it('returns BAD_REQUEST when param minute is not number', () => {
             if (!thumbnailsHandler.get) {
                 fail();
@@ -37,18 +18,6 @@ describe('ThumbnailsHandler', () => {
                 params: {
                     id: 1,
                     minute: 'string',
-                } as RequestParams,
-            } as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
-        });
-        it('returns BAD_REQUEST when no video found', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
-            const mockedContext = {
-                params: {
-                    id: 1,
-                    minute: 0,
                 } as RequestParams,
             } as RequestContext;
             expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);

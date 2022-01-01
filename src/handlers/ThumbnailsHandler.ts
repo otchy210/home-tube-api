@@ -15,7 +15,7 @@ export const thumbnailsHandler: RequestHandler = {
             return BAD_REQUEST;
         }
         const thumbnailsManager = useThumbnailsManager();
-        const videoPath = video.values.path as string;
+        const videoPath = video.path as string;
         const thumbnailsPath = thumbnailsManager.get(videoPath, minute);
         if (!thumbnailsPath) {
             return NOT_FOUND;
