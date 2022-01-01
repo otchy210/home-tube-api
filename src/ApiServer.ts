@@ -18,6 +18,7 @@ import { useMetaManager } from './videos/MetaManager';
 import { useThumbnailsManager } from './videos/ThumbnailsManager';
 import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 import { useVideoCollection } from './videos/VideoCollection';
+import { videoHandler } from './handlers/VideoHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE'];
 
@@ -127,7 +128,7 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler];
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, videoHandler];
 
 export default class ApiServer {
     private port: number;
