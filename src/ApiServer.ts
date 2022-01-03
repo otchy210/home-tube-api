@@ -29,7 +29,6 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
         return { urlPath: url };
     }
     const urlPath = url.substring(0, charIndex);
-    // TODO: HTTP url decode
     const params = url
         .substring(charIndex + 1)
         .split('&')
@@ -38,11 +37,12 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
             if (map[key] !== undefined) {
                 throw new Error(`Duplicate param name is not allowed: ${key}`);
             }
+            const decodedValue = decodeURIComponent(value);
             try {
-                map[key] = JSON.parse(value);
+                map[key] = JSON.parse(decodedValue);
             } catch {
                 // treat all parse errors as string value
-                map[key] = value;
+                map[key] = decodedValue;
             }
             return map;
         }, {});
