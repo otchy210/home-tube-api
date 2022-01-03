@@ -33,11 +33,13 @@ export type ErrorResponse = {
     message: string;
 };
 
+export type RequestMethod = (context: RequestContext) => Json | ErrorResponse;
+
 export type RequestHandler = {
     path: string;
-    get?: (context: RequestContext) => Json | ErrorResponse;
-    post?: (context: RequestContext) => Json | ErrorResponse;
-    delete?: (context: RequestContext) => Json | ErrorResponse;
+    get?: RequestMethod;
+    post?: RequestMethod;
+    delete?: RequestMethod;
 };
 
 type JsonPrimitive = string | number | boolean | null;
