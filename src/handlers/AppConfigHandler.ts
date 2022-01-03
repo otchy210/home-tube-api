@@ -1,7 +1,7 @@
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
-import { RequestHandler } from '../types';
+import { RequestHandler, RequestMethod } from '../types';
 
-export const appConfigHandler: RequestHandler = {
+export const appConfigHandler: RequestHandler & { get: RequestMethod; post: RequestMethod } = {
     path: '/appConfig',
     get: ({ appConfig }) => {
         return appConfig;

@@ -36,16 +36,10 @@ describe('validateAndGetVideo', () => {
 describe('videoHandler', () => {
     describe('get', () => {
         it('returns BAD_REQUEST when validation fails', () => {
-            if (!root.videoHandler.get) {
-                fail();
-            }
             const mockedContext = {} as RequestContext;
             expect(root.videoHandler.get(mockedContext)).toBe(BAD_REQUEST);
         });
         it('returns whole view of video properly', () => {
-            if (!root.videoHandler.get) {
-                fail();
-            }
             jest.spyOn(root, 'validateAndGetVideo').mockReturnValue({
                 path: 'test/test-movie.mp4',
             });

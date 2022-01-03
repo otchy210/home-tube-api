@@ -9,9 +9,6 @@ describe('appConfigHandler', () => {
         const mockedContext = {
             appConfig: TEST_CONFIG,
         } as RequestContext;
-        if (!appConfigHandler.get) {
-            fail();
-        }
         expect(appConfigHandler.get(mockedContext)).toStrictEqual(TEST_CONFIG);
     });
 

@@ -22,12 +22,13 @@ class PropertiesManager {
         videoCollection.updateProperties(path, properties);
         return properties;
     }
-    public update(path: string, properties: VideoProperties) {
+    public update(path: string, properties: VideoProperties): VideoProperties {
         const { metaDir } = parsePath(path);
         const propertiesPath = getPropertiesPath(metaDir);
         writeFileSync(propertiesPath, JSON.stringify(properties));
         const videoCollection = useVideoCollection();
         videoCollection.updateProperties(path, properties);
+        return properties;
     }
 }
 

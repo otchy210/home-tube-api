@@ -11,9 +11,6 @@ describe('ThumbnailsHandler', () => {
     });
     describe('get', () => {
         it('returns BAD_REQUEST when param minute is not number', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
             const mockedContext = {
                 params: {
                     id: 1,
@@ -23,9 +20,6 @@ describe('ThumbnailsHandler', () => {
             expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
         });
         it('returns NOT_FOUND when no thumbnails file found', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
             const videoCollection = useVideoCollection();
             const mockedGet = jest.spyOn(videoCollection, 'get');
             mockedGet.mockReturnValue({
@@ -43,9 +37,6 @@ describe('ThumbnailsHandler', () => {
             expect(thumbnailsHandler.get(mockedContext)).toBe(NOT_FOUND);
         });
         it('returns thumbnails path when thumbnails file found', () => {
-            if (!thumbnailsHandler.get) {
-                fail();
-            }
             const videoCollection = useVideoCollection();
             const mockedGetVideo = jest.spyOn(videoCollection, 'get');
             mockedGetVideo.mockReturnValue({
