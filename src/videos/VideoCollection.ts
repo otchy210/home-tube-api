@@ -8,7 +8,7 @@ type LengthTag = {
     tag: string;
     label: string;
 };
-const LENGTH_TAGS: LengthTag[] = [
+export const LENGTH_TAGS: LengthTag[] = [
     { length: 30, tag: 'moment', label: 'Moment (<=30s)' },
     { length: 60 * 5, tag: 'short', label: 'Short (<=5m)' },
     { length: 60 * 20, tag: 'middle', label: 'Middle (<=20m)' },
@@ -21,12 +21,12 @@ type SizeTag = {
     tag: string;
     label: string;
 };
-const SIZE_TAGS: SizeTag[] = [
-    { size: 720, tag: 'sd', label: 'SD (~720×480)' },
-    { size: 1280, tag: 'hd', label: 'HD (~1280×720)' },
-    { size: 1920, tag: 'fhd', label: 'Full HD (~1920×1080)' },
-    { size: 3840, tag: '4k', label: '4K (~3840×2160)' },
-    { size: 7680, tag: '8k', label: '8K (~7680×4320)' },
+export const SIZE_TAGS: SizeTag[] = [
+    { size: 720, tag: 'sd', label: 'SD (~720x480)' },
+    { size: 1280, tag: 'hd', label: 'HD (~1280x720)' },
+    { size: 1920, tag: 'fhd', label: 'Full HD (~1920x1080)' },
+    { size: 3840, tag: '4k', label: '4K (~3840x2160)' },
+    { size: 7680, tag: '8k', label: '8K (~7680x4320)' },
 ];
 
 const PATH_DELIM = /[/\\]+/;
@@ -65,14 +65,14 @@ class VideoCollection {
     public get(id: number): Document {
         return this.collection.get(id);
     }
-    public add(path: string) {
+    public add(path: string): void {
         const name = basename(path);
         const names = getNames(path);
         this.collection.add({
             values: { path, name, names },
         });
     }
-    public updateMeta(path: string, meta: VideoMeta) {
+    public updateMeta(path: string, meta: VideoMeta): Document | undefined {
         const results = this.collection.find({ path });
         if (results.size === 0) {
             return;
@@ -100,24 +100,25 @@ class VideoCollection {
                 }
             }
         }
-        this.collection.update(doc);
+        return this.collection.update(doc);
     }
-    public updateProperties(path: string, properties: VideoProperties) {
+    public updateProperties(path: string, properties: VideoProperties): Document | undefined {
         const results = this.collection.find({ path });
         if (results.size === 0) {
             return;
         }
         const doc = results.values().next().value as Document;
-        if (properties.stars) {
+        if (properties.stars !== undefined) {
             const stars: number[] = [];
             for (let s = 1; s <= properties.stars; s++) {
                 stars.push(s);
             }
             doc.values.stars = stars;
         }
-        if (properties.tags) {
+        if (properties.tags !== undefined) {
             doc.values.tags = properties.tags;
         }
+        return this.collection.update(doc);
     }
     public remove(path: string): void {
         this.collection.removeMatched({ path });
