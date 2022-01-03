@@ -1,3 +1,4 @@
+import { initializeWorkers, stopWorkers } from '../videos/FFMpegWorkersManager';
 import { RequestContext, RequestParams } from '../types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { usePropertiesManager } from '../videos/PropertiesManager';
@@ -34,6 +35,9 @@ describe('validateAndGetVideo', () => {
 });
 
 describe('videoHandler', () => {
+    beforeAll(() => {
+        initializeWorkers();
+    });
     describe('get', () => {
         it('returns BAD_REQUEST when validation fails', () => {
             const mockedContext = {} as RequestContext;
@@ -53,9 +57,19 @@ describe('videoHandler', () => {
                 } as RequestParams,
             } as RequestContext;
             expect(root.videoHandler.get(mockedContext)).toStrictEqual({
+                acodec: 'aac',
+                duration: '3',
+                height: 1080,
+                length: 3.08,
+                name: 'test-movie.mp4',
                 path: 'test/test-movie.mp4',
                 stars: 5,
+                vcodec: 'h264',
+                width: 1920,
             });
         });
+    });
+    afterAll(() => {
+        stopWorkers();
     });
 });

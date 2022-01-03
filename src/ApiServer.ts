@@ -29,6 +29,7 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
         return { urlPath: url };
     }
     const urlPath = url.substring(0, charIndex);
+    // TODO: HTTP url decode
     const params = url
         .substring(charIndex + 1)
         .split('&')
