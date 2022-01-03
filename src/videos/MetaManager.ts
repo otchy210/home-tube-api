@@ -4,6 +4,7 @@ import { join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
+import { usePropertiesManager } from './PropertiesManager';
 import { useThumbnailsManager } from './ThumbnailsManager';
 import { useVideoCollection } from './VideoCollection';
 
@@ -25,6 +26,8 @@ class MetaManager extends FFmpegWorker {
         await writeFile(metaPath, JSON.stringify(meta));
         const videoCollection = useVideoCollection();
         videoCollection.updateMeta(path, meta);
+        // index properties
+        usePropertiesManager().get(path);
         // generate thumbnails
         useThumbnailsManager().get(path, 0);
     }
@@ -42,6 +45,8 @@ class MetaManager extends FFmpegWorker {
                     const meta = JSON.parse(buf.toString());
                     const videoCollection = useVideoCollection();
                     videoCollection.updateMeta(path, meta);
+                    // index properties
+                    usePropertiesManager().get(path);
                     // generate thumbnails as needed
                     useThumbnailsManager().get(path, 0);
                     resolve(meta);

@@ -55,7 +55,7 @@ const fields: Field[] = [
     { name: 'width', type: 'number', indexed: false },
     { name: 'height', type: 'number', indexed: false },
     { name: 'size', type: 'tag', indexed: true },
-    { name: 'stars', type: 'number[]', indexed: true },
+    { name: 'stars', type: 'number', indexed: true },
     { name: 'tags', type: 'tags', indexed: true },
 ];
 
@@ -109,11 +109,7 @@ class VideoCollection {
         }
         const doc = results.values().next().value as Document;
         if (properties.stars !== undefined) {
-            const stars: number[] = [];
-            for (let s = 1; s <= properties.stars; s++) {
-                stars.push(s);
-            }
-            doc.values.stars = stars;
+            doc.values.stars = properties.stars;
         }
         if (properties.tags !== undefined) {
             doc.values.tags = properties.tags;
