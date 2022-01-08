@@ -1,5 +1,5 @@
 import { Values } from '@otchy/sim-doc-db/dist/types';
-import { ErrorResponse, Json, RequestHandler, RequestMethod, RequestParams } from '../types';
+import { ErrorResponse, RequestHandler, RequestMethod, RequestParams, VideoDetails } from '../types';
 import logger from '../utils/logger';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { useMetaManager } from '../videos/MetaManager';
@@ -41,6 +41,6 @@ export const videoHandler: RequestHandler & { get: RequestMethod } = {
         const meta = metaManager.getRequiredMeta(path);
         const propertiesManager = usePropertiesManager();
         const properties = propertiesManager.get(path);
-        return { ...video, ...meta, ...properties } as Json;
+        return { ...video, ...meta, ...properties } as VideoDetails;
     },
 };

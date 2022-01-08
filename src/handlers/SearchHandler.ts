@@ -1,4 +1,4 @@
-import { RequestHandler, RequestMethod } from '../types';
+import { RequestHandler, RequestMethod, VideoDocument } from '../types';
 import { Query } from '@otchy/sim-doc-db/dist/types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { useVideoCollection } from '../videos/VideoCollection';
@@ -18,6 +18,6 @@ export const searchHandler: RequestHandler & { get: RequestMethod } = {
         }
         const videoCollection = useVideoCollection();
         const results = videoCollection.find(params as Query);
-        return Array.from(results);
+        return Array.from(results) as VideoDocument[];
     },
 };

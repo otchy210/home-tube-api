@@ -52,6 +52,22 @@ type JsonObject = {
 
 export type Json = JsonPrimitive | JsonArray | JsonObject;
 
+export type VideoValues = {
+    path: string;
+    name: string;
+    duration?: string;
+    width?: number;
+    height?: number;
+    size?: string;
+    stars?: Stars;
+    tags?: string[];
+};
+
+export type VideoDocument = {
+    id: number;
+    values: VideoValues;
+};
+
 export type VideoMeta = {
     name?: string;
     duration?: string;
@@ -62,16 +78,18 @@ export type VideoMeta = {
     acodec?: string;
 };
 
-export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta> => {
-    if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec) {
-        return true;
-    }
-    return false;
-};
-
 export type Stars = 1 | 2 | 3 | 4 | 5;
 
 export type VideoProperties = {
     stars?: Stars;
     tags?: string[];
+};
+
+export type VideoDetails = VideoValues & VideoMeta & VideoProperties;
+
+export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta> => {
+    if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec) {
+        return true;
+    }
+    return false;
 };
