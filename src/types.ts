@@ -55,6 +55,7 @@ export type Json = JsonPrimitive | JsonArray | JsonObject;
 export type VideoValues = {
     path: string;
     name: string;
+    names: string[];
     duration?: string;
     width?: number;
     height?: number;
