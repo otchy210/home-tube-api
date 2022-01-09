@@ -1,6 +1,7 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
 import {
+    buildJsonResponseHeaders,
     isErrorResponse,
     writeBadRequest,
     writeErrorResponse,
@@ -51,66 +52,66 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
 
 export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler) => {
     let handlerResponse: Json | ErrorResponse | undefined;
+    const origin = context.request?.headers?.origin;
     try {
         switch (context.request.method) {
             case 'GET':
                 if (handler?.get === undefined) {
-                    writeMethodNotAllowed(response);
+                    writeMethodNotAllowed(response, origin);
                     return;
                 }
                 handlerResponse = handler.get(context);
                 break;
             case 'POST':
                 if (handler?.post === undefined) {
-                    writeMethodNotAllowed(response);
+                    writeMethodNotAllowed(response, origin);
                     return;
                 }
                 handlerResponse = handler.post(context);
                 break;
             case 'DELETE':
                 if (handler?.delete === undefined) {
-                    writeMethodNotAllowed(response);
+                    writeMethodNotAllowed(response, origin);
                     return;
                 }
                 handlerResponse = handler.delete(context);
                 break;
         }
         if (handlerResponse === undefined) {
-            writeBadRequest(response);
+            writeBadRequest(response, origin);
         } else if (isErrorResponse(handlerResponse)) {
-            writeErrorResponse(response, handlerResponse);
+            writeErrorResponse(response, handlerResponse, origin);
         } else {
-            response.writeHead(200, {
-                'Content-Type': 'application/json; charset=UTF-8',
-            });
+            response.writeHead(200, buildJsonResponseHeaders(origin));
             response.write(JSON.stringify(handlerResponse));
             response.end();
         }
     } catch (e) {
         logger.error(e);
-        writeInternalServerError(response);
+        writeInternalServerError(response, origin);
     }
 };
 
 export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
     const { method, url } = context.request;
+    const origin = context.request?.headers?.origin;
     if (method === undefined) {
-        writeBadRequest(response);
+        writeBadRequest(response, origin);
         return;
     }
     if (!supportedMethods.includes(method)) {
-        writeMethodNotAllowed(response);
+        writeMethodNotAllowed(response, origin);
         return;
     }
     if (url === undefined) {
-        writeNotFound(response);
+        writeNotFound(response, origin);
         return;
     }
 
     const urlParams = parseUrl(url);
     const handler = requestHandlers.get(urlParams.urlPath);
     if (!handler) {
-        writeNotFound(response);
+        writeNotFound(response, origin);
         return;
     }
     if (urlParams.params) {

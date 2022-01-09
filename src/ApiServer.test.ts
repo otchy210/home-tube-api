@@ -1,7 +1,7 @@
 import ApiServer, { handleRequestEnd, parseUrl } from './ApiServer';
 import { IncomingMessage, ServerResponse } from 'http';
 import { handleRequest } from './ApiServer';
-import { writeBadRequest, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
+import { buildJsonResponseHeaders, writeBadRequest, writeMethodNotAllowed, writeNotFound } from './utils/ServerResponseUtils';
 import { AppConfig, RequestContext, RequestHandler } from './types';
 import * as request from 'supertest';
 
@@ -37,6 +37,7 @@ describe('handleRequest', () => {
     const mockedWriteBadRequest = writeBadRequest as jest.Mock;
     const mockedWriteMethodNotAllowed = writeMethodNotAllowed as jest.Mock;
     const mockedWriteNotFound = writeNotFound as jest.Mock;
+    const mockedBuildJsonResponseHeaders = buildJsonResponseHeaders as jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -88,6 +89,7 @@ describe('handleRequest', () => {
             const mockedRequestHandler = {
                 get: jest.fn().mockReturnValue({ result: 'ok' }),
             } as unknown as RequestHandler;
+            mockedBuildJsonResponseHeaders.mockReturnValue({ dummy: '1' });
 
             handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
 

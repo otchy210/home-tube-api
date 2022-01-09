@@ -31,23 +31,38 @@ export const INTERNAL_SERVER_ERROR = {
     message: 'Internal Server Error',
 } as ErrorResponse;
 
-export const writeErrorResponse = (res: ServerResponse, errorResponse: ErrorResponse): void => {
-    res.writeHead(errorResponse.status, errorResponse.message);
+type ResponseHeaders = {
+    'Content-Type': string;
+    'Access-Control-Allow-Origin'?: string;
+};
+
+export const buildJsonResponseHeaders = (origin: string | undefined): ResponseHeaders => {
+    const responseHeaders = {
+        'Content-Type': 'application/json; charset=UTF-8',
+    } as ResponseHeaders;
+    if (origin) {
+        responseHeaders['Access-Control-Allow-Origin'] = origin;
+    }
+    return responseHeaders;
+};
+
+export const writeErrorResponse = (res: ServerResponse, errorResponse: ErrorResponse, origin: string | undefined): void => {
+    res.writeHead(errorResponse.status, errorResponse.message, {});
     res.end();
 };
 
-export const writeBadRequest = (res: ServerResponse): void => {
-    writeErrorResponse(res, BAD_REQUEST);
+export const writeBadRequest = (res: ServerResponse, origin: string | undefined): void => {
+    writeErrorResponse(res, BAD_REQUEST, origin);
 };
 
-export const writeNotFound = (res: ServerResponse): void => {
-    writeErrorResponse(res, NOT_FOUND);
+export const writeNotFound = (res: ServerResponse, origin: string | undefined): void => {
+    writeErrorResponse(res, NOT_FOUND, origin);
 };
 
-export const writeMethodNotAllowed = (res: ServerResponse): void => {
-    writeErrorResponse(res, METHOD_NOT_ALLOWED);
+export const writeMethodNotAllowed = (res: ServerResponse, origin: string | undefined): void => {
+    writeErrorResponse(res, METHOD_NOT_ALLOWED, origin);
 };
 
-export const writeInternalServerError = (res: ServerResponse): void => {
-    writeErrorResponse(res, INTERNAL_SERVER_ERROR);
+export const writeInternalServerError = (res: ServerResponse, origin: string | undefined): void => {
+    writeErrorResponse(res, INTERNAL_SERVER_ERROR, origin);
 };
