@@ -22,7 +22,7 @@ import { useVideoCollection } from './videos/VideoCollection';
 import { videoHandler } from './handlers/VideoHandler';
 import { propertiesHandler } from './handlers/PropertiesHandler';
 
-const supportedMethods = ['GET', 'POST', 'DELETE'];
+const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
 export const parseUrl = (url: string): { urlPath: string; params?: RequestParams } => {
     const charIndex = url.indexOf('?');
@@ -101,6 +101,17 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     }
     if (!supportedMethods.includes(method)) {
         writeMethodNotAllowed(response, origin);
+        return;
+    }
+    if (method === 'OPTIONS') {
+        const responseHeaders = {
+            'Access-Control-Allow-Origin': origin,
+            'Access-Control-Allow-Methods': supportedMethods.join(', '),
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': 7200,
+        };
+        response.writeHead(204, responseHeaders);
+        response.end();
         return;
     }
     if (url === undefined) {
