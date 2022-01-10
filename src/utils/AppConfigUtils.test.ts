@@ -1,8 +1,7 @@
 import { execSync } from 'child_process';
 import { unlinkSync } from 'fs';
 import { setTimeout } from 'timers';
-import { AppConfig } from '../types';
-import { DEFAULT_APP_CONFIG, getAppConfigDeepCopy, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './AppConfigUtils';
+import { DEFAULT_APP_CONFIG, getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './AppConfigUtils';
 import { TEST_CONFIG_PATH, TEST_CONFIG } from './TestConst';
 
 describe('getDefaultAppConfigPath', () => {
@@ -31,25 +30,5 @@ describe('saveAppConfig', () => {
             unlinkSync(tmpConfig);
             done();
         }, 100);
-    });
-});
-
-describe('getAppConfigDeepCopy', () => {
-    it('copies appConfig deeply', () => {
-        const src: AppConfig = {
-            storages: [
-                {
-                    path: 'a',
-                    enabled: true,
-                },
-                {
-                    path: 'b',
-                    enabled: false,
-                },
-            ],
-            ffmpeg: 'c',
-        };
-        const copy = getAppConfigDeepCopy(src);
-        expect(copy).toStrictEqual(src);
     });
 });

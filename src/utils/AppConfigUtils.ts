@@ -25,14 +25,3 @@ export const loadAppConfig = (path: string): AppConfig => {
 export const saveAppConfig = (path: string, appConfig: AppConfig): void => {
     writeFileSync(path, JSON.stringify(appConfig, undefined, 2));
 };
-
-export const getAppConfigDeepCopy = (src: AppConfig): AppConfig => {
-    return {
-        ...src,
-        storages: [
-            ...src.storages.map((storage) => {
-                return { ...storage };
-            }),
-        ],
-    };
-};
