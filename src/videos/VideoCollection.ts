@@ -65,6 +65,9 @@ class VideoCollection {
     public get(id: number): Document {
         return this.collection.get(id);
     }
+    public getAll(): Set<Document> {
+        return this.collection.getAll();
+    }
     public add(path: string): void {
         const name = basename(path);
         const names = getNames(path);

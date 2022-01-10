@@ -8,15 +8,15 @@ const ALLOWED_SEARCH_PARAMS = new Set<string>(['names', 'length', 'size', 'stars
 export const searchHandler: RequestHandler & { get: RequestMethod } = {
     path: '/search',
     get: ({ params }) => {
-        if (!params) {
-            return BAD_REQUEST;
+        const videoCollection = useVideoCollection();
+        if (!params || Object.keys(params).length === 0) {
+            return Array.from(videoCollection.getAll());
         }
         for (const param of Object.keys(params)) {
             if (!ALLOWED_SEARCH_PARAMS.has(param)) {
                 return BAD_REQUEST;
             }
         }
-        const videoCollection = useVideoCollection();
         const results = videoCollection.find(params as Query);
         return Array.from(results) as VideoDocument[];
     },

@@ -1,6 +1,6 @@
 {
     "name": "@otchy/home-tube-api",
-    "version": "0.9.6",
+    "version": "0.9.7",
     "description": "API Server for HomeTube",
     "main": "dist/index.js",
     "files": [
@@ -55,6 +55,6 @@
         "preset": "ts-jest/presets/default-esm"
     },
     "dependencies": {
-        "@otchy/sim-doc-db": "^0.9.8"
+        "@otchy/sim-doc-db": "^0.9.10"
     }
 }
