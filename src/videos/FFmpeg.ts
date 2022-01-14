@@ -10,8 +10,9 @@ const getFFmpeg = (): string => {
     return execSync('which ffmpeg').toString().trim();
 };
 
-const getTmpDir = (): string => {
-    return process.env.TMPDIR ?? process.env.TMP ?? process.env.TEMP ?? '/tmp';
+const getRandomTmpDir = (): string => {
+    const envTmp = process.env.TMPDIR ?? process.env.TMP ?? process.env.TEMP ?? '/tmp';
+    return join(envTmp, 'home-tube', Math.random().toString(32).substring(2));
 };
 
 const parseMetaDuration = (line: string): { duration: string; length: number } => {
@@ -45,22 +46,46 @@ const parseMetaAudio = (line: string): { acodec: string } => {
     return { acodec };
 };
 
-const THUMBNAIL_TMP_DIR = 'home-tube';
-const THUMBNAIL_SIZE = 240;
-const THUMBNAIL_ROW_SIZE = 60;
-const THUMBNAIL_JPEG_QUALITY = 5;
+const formatSeekTime = (positoin: number): string => {
+    let sec = positoin;
+    let min = 0;
+    let hour = 0;
+    while (sec > 60 * 60) {
+        hour++;
+        sec -= 60 * 60;
+    }
+    while (sec > 60) {
+        min++;
+        sec -= 60;
+    }
+    return [hour, min, sec]
+        .map((num) => {
+            return String(num).padStart(2, '0');
+        })
+        .join(':');
+};
+
+const THUMBNAIL = {
+    SIZE: 240,
+    ROW_SIZE: 60,
+    JPEG_QUALITY: 5,
+};
 
 export const getThumbnailsName = (index: number): string => {
     return `thumbnails_${String(index).padStart(3, '0')}.jpg`;
 };
 
+export const SNAPSHOT = {
+    FILE: 'snapshot.jpg',
+    SIZE: 720,
+    JPEG_QUALITY: 1,
+};
+
 export default class FFmpeg {
     private ffmpeg: string;
-    private tmp: string;
 
     constructor(ffmpeg?: string) {
         this.ffmpeg = ffmpeg || getFFmpeg();
-        this.tmp = getTmpDir();
     }
 
     public getMeta(path: string): VideoMeta {
@@ -87,21 +112,21 @@ export default class FFmpeg {
             return Promise.resolve(false);
         }
         const length = Math.floor(meta.length);
-        const tmpDir = join(this.tmp, THUMBNAIL_TMP_DIR, Math.random().toString(32).substring(2));
+        const tmpDir = getRandomTmpDir();
         return new Promise((resolve) => {
             (async () => {
                 await mkdir(tmpDir, { recursive: true });
-                const scale = meta.width >= meta.height ? `${THUMBNAIL_SIZE}:-1` : `-1:${THUMBNAIL_SIZE}`;
+                const scale = meta.width >= meta.height ? `${THUMBNAIL.SIZE}:-1` : `-1:${THUMBNAIL.SIZE}`;
                 const outputPath = join(tmpDir, '%04d.png');
-                const thumbnailsCommand = `${this.ffmpeg} -i "${path}" -vf scale=${scale},fps=1 "${outputPath}"`;
+                const thumbnailsCommand = [this.ffmpeg, `-i "${path}"`, `-vf scale=${scale},fps=1`, `"${outputPath}"`].join(' ');
                 await execPromise(thumbnailsCommand).catch((error) => {
                     logger.error(error);
                 });
                 let rows = 0;
                 const outputFiles: string[] = [];
-                for (let i = 1; i < length; i += THUMBNAIL_ROW_SIZE) {
+                for (let i = 1; i < length; i += THUMBNAIL.ROW_SIZE) {
                     const inputPaths: string[] = [];
-                    for (let r = 0; r < THUMBNAIL_ROW_SIZE; r++) {
+                    for (let r = 0; r < THUMBNAIL.ROW_SIZE; r++) {
                         const count = i + r;
                         if (count >= length) {
                             break;
@@ -109,10 +134,16 @@ export default class FFmpeg {
                         const inputPath = join(tmpDir, `${String(count).padStart(4, '0')}.png`);
                         inputPaths.push(inputPath);
                     }
-                    const inputPathsCommand = inputPaths.map((inputPath) => `-i "${inputPath}"`).join(' ');
                     const outputFile = getThumbnailsName(rows);
                     const outputPath = join(tmpDir, outputFile);
-                    const hstackCommand = `${this.ffmpeg} ${inputPathsCommand} -filter_complex hstack=inputs=${inputPaths.length} -qscale ${THUMBNAIL_JPEG_QUALITY} ${outputPath}`;
+                    const hstackCommand = [
+                        this.ffmpeg,
+                        ...inputPaths.map((inputPath) => `-i "${inputPath}"`),
+                        '-filter_complex',
+                        `hstack=inputs=${inputPaths.length}`,
+                        `-qscale ${THUMBNAIL.JPEG_QUALITY}`,
+                        `"${outputPath}"`,
+                    ].join(' ');
                     await execPromise(hstackCommand).catch((error) => {
                         logger.error(error);
                     });
@@ -128,6 +159,40 @@ export default class FFmpeg {
                         logger.error(error);
                     });
                 }
+                resolve(true);
+            })();
+        });
+    }
+
+    public createSnapshot(path: string, meta: Required<VideoMeta>, position?: number): Promise<boolean> {
+        if (!meta.height || !meta.width || !meta.length) {
+            return Promise.resolve(false);
+        }
+        const seekTime = position ?? Math.floor(meta.length / 2);
+        const tmpDir = getRandomTmpDir();
+        return new Promise((resolve) => {
+            (async () => {
+                await mkdir(tmpDir, { recursive: true });
+                const scale = meta.width >= meta.height ? `${SNAPSHOT.SIZE}:-1` : `-1:${SNAPSHOT.SIZE}`;
+                const srcPath = join(tmpDir, SNAPSHOT.FILE);
+                const snapshotCommand = [
+                    this.ffmpeg,
+                    `-i "${path}"`,
+                    `-vf scale=${scale}`,
+                    `-ss ${formatSeekTime(seekTime)}`,
+                    '-frames:v 1',
+                    `-qscale ${SNAPSHOT.JPEG_QUALITY}`,
+                    `"${srcPath}"`,
+                ].join(' ');
+                await execPromise(snapshotCommand).catch((error) => {
+                    logger.error(error);
+                });
+                const { metaDir } = parsePath(path);
+                await mkdir(metaDir, { recursive: true });
+                const destPath = join(metaDir, SNAPSHOT.FILE);
+                await copyFile(srcPath, destPath).catch((error) => {
+                    logger.error(error);
+                });
                 resolve(true);
             })();
         });

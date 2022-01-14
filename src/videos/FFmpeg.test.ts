@@ -55,4 +55,22 @@ describe('FFmpeg', () => {
             });
         });
     });
+
+    describe('createSnapshot', () => {
+        it('works', (done) => {
+            const path = 'test/test-movie.wmv';
+            const meta = ffmpeg.getMeta(path);
+            if (!isRequiredVideoMeta(meta)) {
+                throw new Error();
+            }
+            ffmpeg.createSnapshot(path, meta).then(() => {
+                const { metaDir } = parsePath(path);
+                const snapshotPath = join(metaDir, 'snapshot.jpg');
+                expect(existsSync(snapshotPath)).toBe(true);
+                unlinkSync(snapshotPath);
+                rmdirSync(metaDir);
+                done();
+            });
+        });
+    });
 });

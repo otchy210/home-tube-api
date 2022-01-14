@@ -2,3 +2,4 @@ node_modules/
 dist/
 tmp/
 rest.http
+.DS_Store
