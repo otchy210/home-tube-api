@@ -21,6 +21,7 @@ import { useVideoCollection } from './videos/VideoCollection';
 import { videoHandler } from './handlers/VideoHandler';
 import { propertiesHandler } from './handlers/PropertiesHandler';
 import send = require('send');
+import { snapshotHandler } from './handlers/SnapshotHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -145,7 +146,7 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, videoHandler, propertiesHandler];
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, videoHandler, propertiesHandler, snapshotHandler];
 
 export default class ApiServer {
     private port: number;
