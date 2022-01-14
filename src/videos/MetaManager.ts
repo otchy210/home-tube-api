@@ -5,6 +5,7 @@ import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { usePropertiesManager } from './PropertiesManager';
+import { useSnapshotManager } from './SnapshotManager';
 import { useThumbnailsManager } from './ThumbnailsManager';
 import { useVideoCollection } from './VideoCollection';
 
@@ -12,6 +13,15 @@ const META_FILE = 'meta.json';
 
 const getMetaPath = (metaDir: string): string => {
     return join(metaDir, META_FILE);
+};
+
+const enqueuSubTasksAsNeeded = (path: string): void => {
+    // index properties
+    usePropertiesManager().get(path);
+    // generate thumbnails
+    useThumbnailsManager().get(path, 0);
+    // generage snapshot
+    useSnapshotManager().get(path);
 };
 
 class MetaManager extends FFmpegWorker {
@@ -26,10 +36,7 @@ class MetaManager extends FFmpegWorker {
         await writeFile(metaPath, JSON.stringify(meta));
         const videoCollection = useVideoCollection();
         videoCollection.updateMeta(path, meta);
-        // index properties
-        usePropertiesManager().get(path);
-        // generate thumbnails
-        useThumbnailsManager().get(path, 0);
+        enqueuSubTasksAsNeeded(path);
     }
 
     /**
@@ -45,10 +52,7 @@ class MetaManager extends FFmpegWorker {
                     const meta = JSON.parse(buf.toString());
                     const videoCollection = useVideoCollection();
                     videoCollection.updateMeta(path, meta);
-                    // index properties
-                    usePropertiesManager().get(path);
-                    // generate thumbnails as needed
-                    useThumbnailsManager().get(path, 0);
+                    enqueuSubTasksAsNeeded(path);
                     resolve(meta);
                 })
                 .catch(() => {

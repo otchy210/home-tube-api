@@ -14,9 +14,8 @@ import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
 import logger from './utils/logger';
-import { initializeWorkers, reinstantiateWorkers } from './videos/FFmpegWorkersManager';
+import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
-import { useThumbnailsManager } from './videos/ThumbnailsManager';
 import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 import { useVideoCollection } from './videos/VideoCollection';
 import { videoHandler } from './handlers/VideoHandler';
@@ -245,10 +244,7 @@ export default class ApiServer {
     }
 
     public close(): ApiServer {
-        const metaManager = useMetaManager();
-        const thumbnailsManager = useThumbnailsManager();
-        metaManager.stopMonitoring();
-        thumbnailsManager.stopMonitoring();
+        stopWorkers();
         this.httpServer.close();
         return this;
     }

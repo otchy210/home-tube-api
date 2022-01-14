@@ -9,20 +9,12 @@ const getThumbnailsPath = (metaDir: string, minute: number): string => {
     return join(metaDir, getThumbnailsName(minute));
 };
 
-type ThumbnailsStatus = 'PROCESSING';
-
 class ThumbnailsManager extends FFmpegWorker {
-    private statuses = new Map<string, ThumbnailsStatus>();
-
     constructor(ffmpeg?: string) {
         super(ffmpeg);
     }
 
     async consume({ path, metaDir }: ConsumeParams): Promise<void> {
-        const status = this.statuses.get(path);
-        if (status === 'PROCESSING') {
-            return;
-        }
         const metaManager = useMetaManager();
         const meta = metaManager.getRequiredMeta(path);
         if (!meta) {
@@ -40,22 +32,20 @@ class ThumbnailsManager extends FFmpegWorker {
         if (existsAll) {
             return;
         }
-        this.statuses.set(path, 'PROCESSING');
         await this.ffmpeg.createThumbnails(path, meta);
-        this.statuses.delete(path);
     }
 
     /**
      * Returns thumbnails path if thumbnails file exists.
      * Otherwize returns empty string but enqueue data processing job (when minute === 0)
      */
-    public get(path: string, minute: number, enqueueIfNoThumbnails = true): string {
+    public get(path: string, minute: number, enqueueIfNoFile = true): string {
         const { metaDir } = parsePath(path);
         const thumbnailsPath = getThumbnailsPath(metaDir, minute);
         if (existsSync(thumbnailsPath)) {
             return thumbnailsPath;
         }
-        if (minute === 0 && enqueueIfNoThumbnails) {
+        if (minute === 0 && enqueueIfNoFile) {
             this.enqueue({ path });
         }
         return '';
@@ -68,20 +58,17 @@ export const initialize = (ffmpeg?: string): void => {
     instance = new ThumbnailsManager(ffmpeg);
 };
 
-export const reinstantiate = (ffmpeg?: string): void => {
-    if (instance === undefined) {
-        throw new Error('ThumbnailsManager is not initialized');
-    }
-    const current = instance;
-    current.stopMonitoring();
-    const currentQueue = current.getQueue();
-    instance = new ThumbnailsManager(ffmpeg);
-    currentQueue.forEach((request) => instance.enqueue(request));
-};
-
 export const useThumbnailsManager = (): ThumbnailsManager => {
     if (instance === undefined) {
         throw new Error('ThumbnailsManager is not initialized');
     }
     return instance;
+};
+
+export const reinstantiate = (ffmpeg?: string): void => {
+    const current = useThumbnailsManager();
+    current.stopMonitoring();
+    const currentQueue = current.getQueue();
+    instance = new ThumbnailsManager(ffmpeg);
+    currentQueue.forEach((request) => instance.enqueue(request));
 };

@@ -36,9 +36,9 @@ type ResponseHeaders = {
     'Access-Control-Allow-Origin'?: string;
 };
 
-export const buildJsonResponseHeaders = (origin: string | undefined): ResponseHeaders => {
+const buildResponseHeaders = (contentType: string, origin: string | undefined): ResponseHeaders => {
     const responseHeaders = {
-        'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': contentType,
     } as ResponseHeaders;
     if (origin) {
         responseHeaders['Access-Control-Allow-Origin'] = origin;
@@ -46,8 +46,16 @@ export const buildJsonResponseHeaders = (origin: string | undefined): ResponseHe
     return responseHeaders;
 };
 
+export const buildJsonResponseHeaders = (origin: string | undefined): ResponseHeaders => {
+    return buildResponseHeaders('application/json; charset=UTF-8', origin);
+};
+
+const buildPlainTextResponseHeaders = (origin: string | undefined): ResponseHeaders => {
+    return buildResponseHeaders('text/plain; charset=UTF-8', origin);
+};
+
 export const writeErrorResponse = (res: ServerResponse, errorResponse: ErrorResponse, origin: string | undefined): void => {
-    res.writeHead(errorResponse.status, errorResponse.message, {});
+    res.writeHead(errorResponse.status, errorResponse.message, buildPlainTextResponseHeaders(origin));
     res.end();
 };
 

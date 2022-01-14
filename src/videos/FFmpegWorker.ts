@@ -6,18 +6,23 @@ const MONITOR_INTERVAL = 1000 * 10; // 10 seconds
 
 export type FFmpegRequest = {
     path: string;
+    options?: Record<string, string>;
 };
 
 export type ConsumeParams = {
     path: string;
     name: string;
     metaDir: string;
+    options?: Record<string, string>;
 };
+
+type Status = 'PROCESSING';
 
 export default abstract class FFmpegWorker {
     protected ffmpeg: FFmpeg;
     private queue: FFmpegRequest[] = [];
     private tid: NodeJS.Timeout | undefined;
+    private statuses = new Map<string, Status>();
 
     constructor(ffmpeg?: string) {
         this.ffmpeg = new FFmpeg(ffmpeg);
@@ -41,17 +46,32 @@ export default abstract class FFmpegWorker {
             }, MONITOR_INTERVAL);
             return;
         }
-        const { path } = request;
+        const { path, options } = request;
+        const status = this.statuses.get(path);
+        if (status === 'PROCESSING') {
+            this.check();
+            return;
+        }
+        this.statuses.set(path, 'PROCESSING');
+
         const { name, metaDir } = parsePath(path);
         mkdir(metaDir, { recursive: true }).then(() => {
             const params = {
                 path,
                 name,
                 metaDir,
+                options,
             };
-            this.consume(params).then(() => {
-                this.check();
-            });
+            this.consume(params)
+                .then(() => {
+                    this.check();
+                    this.statuses.delete(path);
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.check();
+                    this.statuses.delete(path);
+                });
         });
     }
 
