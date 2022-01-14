@@ -33,7 +33,9 @@ export type ErrorResponse = {
     message: string;
 };
 
-export type RequestMethod = (context: RequestContext) => Json | ErrorResponse;
+export type RequestHandlerResponse = Json | ErrorResponse | string;
+
+export type RequestMethod = (context: RequestContext) => RequestHandlerResponse;
 
 export type RequestHandler = {
     path: string;

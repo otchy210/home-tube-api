@@ -9,7 +9,7 @@ import {
     writeMethodNotAllowed,
     writeNotFound,
 } from './utils/ServerResponseUtils';
-import { AppConfig, ErrorResponse, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage } from './types';
+import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage, RequestHandlerResponse } from './types';
 import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
 import { StorageManager } from './videos/StorageManager';
@@ -20,6 +20,7 @@ import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 import { useVideoCollection } from './videos/VideoCollection';
 import { videoHandler } from './handlers/VideoHandler';
 import { propertiesHandler } from './handlers/PropertiesHandler';
+import send = require('send');
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -50,7 +51,7 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
 };
 
 export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler) => {
-    let handlerResponse: Json | ErrorResponse | undefined;
+    let handlerResponse: RequestHandlerResponse | undefined;
     const origin = context.request?.headers?.origin;
     try {
         switch (context.request.method) {
@@ -80,6 +81,9 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
             writeBadRequest(response, origin);
         } else if (isErrorResponse(handlerResponse)) {
             writeErrorResponse(response, handlerResponse, origin);
+        } else if (typeof handlerResponse === 'string') {
+            // static file case
+            send(context.request, handlerResponse).pipe(response);
         } else {
             response.writeHead(200, buildJsonResponseHeaders(origin));
             response.write(JSON.stringify(handlerResponse));
