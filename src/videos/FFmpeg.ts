@@ -46,15 +46,15 @@ const parseMetaAudio = (line: string): { acodec: string } => {
     return { acodec };
 };
 
-const formatSeekTime = (positoin: number): string => {
+export const formatSeekTime = (positoin: number): string => {
     let sec = positoin;
     let min = 0;
     let hour = 0;
-    while (sec > 60 * 60) {
+    while (sec >= 60 * 60) {
         hour++;
         sec -= 60 * 60;
     }
-    while (sec > 60) {
+    while (sec >= 60) {
         min++;
         sec -= 60;
     }

@@ -2,8 +2,19 @@ import { existsSync, rmdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
-import FFmpeg from './FFmpeg';
+import FFmpeg, { formatSeekTime } from './FFmpeg';
 
+describe('formatSeekTime', () => {
+    it('works', () => {
+        expect(formatSeekTime(0)).toBe('00:00:00');
+        expect(formatSeekTime(1)).toBe('00:00:01');
+        expect(formatSeekTime(59)).toBe('00:00:59');
+        expect(formatSeekTime(60)).toBe('00:01:00');
+        expect(formatSeekTime(60 * 60 - 1)).toBe('00:59:59');
+        expect(formatSeekTime(60 * 60)).toBe('01:00:00');
+        expect(formatSeekTime(60 * 60 * 99 + 60 * 59 + 59)).toBe('99:59:59');
+    });
+});
 describe('FFmpeg', () => {
     const ffmpeg = new FFmpeg();
     describe('getMeta', () => {
