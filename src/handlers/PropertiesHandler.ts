@@ -1,6 +1,6 @@
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { RequestHandler, RequestMethod } from '../types';
-import { isBadRequest, validateAndGetVideo } from './VideoHandler';
+import { isBadRequest, validateAndGetVideo } from './DetailsHandler';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 
 export const propertiesHandler: RequestHandler & { post: RequestMethod } = {

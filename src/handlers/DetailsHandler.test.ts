@@ -3,7 +3,7 @@ import { RequestContext, RequestParams } from '../types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 import { useVideoCollection } from '../videos/VideoCollection';
-import * as root from './VideoHandler';
+import * as root from './DetailsHandler';
 
 describe('validateAndGetVideo', () => {
     it('returns BAD_REQUEST when no params', () => {
@@ -34,14 +34,14 @@ describe('validateAndGetVideo', () => {
     });
 });
 
-describe('videoHandler', () => {
+describe('detailsHandler', () => {
     beforeAll(() => {
         initializeWorkers();
     });
     describe('get', () => {
         it('returns BAD_REQUEST when validation fails', () => {
             const mockedContext = {} as RequestContext;
-            expect(root.videoHandler.get(mockedContext)).toBe(BAD_REQUEST);
+            expect(root.detailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
         });
         it('returns whole view of video properly', () => {
             jest.spyOn(root, 'validateAndGetVideo').mockReturnValue({
@@ -56,7 +56,7 @@ describe('videoHandler', () => {
                     id: 1,
                 } as RequestParams,
             } as RequestContext;
-            expect(root.videoHandler.get(mockedContext)).toStrictEqual({
+            expect(root.detailsHandler.get(mockedContext)).toStrictEqual({
                 acodec: 'aac',
                 duration: '3',
                 height: 1080,

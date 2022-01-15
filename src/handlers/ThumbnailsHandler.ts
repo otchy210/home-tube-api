@@ -1,7 +1,7 @@
 import { RequestHandler, RequestMethod, RequestParams } from '../types';
 import { BAD_REQUEST, NOT_FOUND } from '../utils/ServerResponseUtils';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
-import { isBadRequest, validateAndGetVideo } from './VideoHandler';
+import { isBadRequest, validateAndGetVideo } from './DetailsHandler';
 
 export const thumbnailsHandler: RequestHandler & { get: RequestMethod } = {
     path: '/thumbnails',

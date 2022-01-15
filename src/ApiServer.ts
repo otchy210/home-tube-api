@@ -18,7 +18,7 @@ import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/F
 import { useMetaManager } from './videos/MetaManager';
 import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 import { useVideoCollection } from './videos/VideoCollection';
-import { videoHandler } from './handlers/VideoHandler';
+import { detailsHandler } from './handlers/DetailsHandler';
 import { propertiesHandler } from './handlers/PropertiesHandler';
 import send = require('send');
 import { snapshotHandler } from './handlers/SnapshotHandler';
@@ -146,7 +146,7 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, videoHandler, propertiesHandler, snapshotHandler];
+const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, detailsHandler, propertiesHandler, snapshotHandler];
 
 export default class ApiServer {
     private port: number;

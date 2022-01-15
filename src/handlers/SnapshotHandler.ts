@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { RequestHandler, RequestMethod } from '../types';
 import { useSnapshotManager } from '../videos/SnapshotManager';
-import { isBadRequest, validateAndGetVideo } from './VideoHandler';
+import { isBadRequest, validateAndGetVideo } from './DetailsHandler';
 
 const NO_SNAPSHOT_FILE = join('images', 'no-snapshot.png');
 

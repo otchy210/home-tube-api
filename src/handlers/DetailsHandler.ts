@@ -1,4 +1,4 @@
-import { Values } from '@otchy/sim-doc-db/dist/types';
+import { Values as dh } from '@otchy/sim-doc-db/dist/types';
 import { ErrorResponse, RequestHandler, RequestMethod, RequestParams, VideoDetails } from '../types';
 import logger from '../utils/logger';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
@@ -6,7 +6,7 @@ import { useMetaManager } from '../videos/MetaManager';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 import { useVideoCollection } from '../videos/VideoCollection';
 
-export const validateAndGetVideo = (params: RequestParams | undefined): Values | ErrorResponse => {
+export const validateAndGetVideo = (params: RequestParams | undefined): dh | ErrorResponse => {
     if (!params) {
         return BAD_REQUEST;
     }
@@ -25,12 +25,12 @@ export const validateAndGetVideo = (params: RequestParams | undefined): Values |
     return video.values;
 };
 
-export const isBadRequest = (video: Values | ErrorResponse): video is ErrorResponse => {
+export const isBadRequest = (video: dh | ErrorResponse): video is ErrorResponse => {
     return video === BAD_REQUEST;
 };
 
-export const videoHandler: RequestHandler & { get: RequestMethod } = {
-    path: '/video',
+export const detailsHandler: RequestHandler & { get: RequestMethod } = {
+    path: '/details',
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
         if (isBadRequest(video)) {
