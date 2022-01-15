@@ -22,6 +22,7 @@ import { detailsHandler } from './handlers/DetailsHandler';
 import { propertiesHandler } from './handlers/PropertiesHandler';
 import send = require('send');
 import { snapshotHandler } from './handlers/SnapshotHandler';
+import { videoHandler } from './handlers/VideoHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -146,7 +147,15 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
     });
 };
 
-const defaultRequestHandlers: RequestHandler[] = [appConfigHandler, searchHandler, thumbnailsHandler, detailsHandler, propertiesHandler, snapshotHandler];
+const defaultRequestHandlers: RequestHandler[] = [
+    appConfigHandler,
+    searchHandler,
+    detailsHandler,
+    snapshotHandler,
+    propertiesHandler,
+    videoHandler,
+    thumbnailsHandler,
+];
 
 export default class ApiServer {
     private port: number;
