@@ -5,7 +5,7 @@ import { ErrorResponse } from '../types';
 export const isErrorResponse = (candidate: any): candidate is ErrorResponse => {
     return (
         Number.isInteger(candidate?.status) &&
-        [400, 404, 405].includes(candidate?.status) &&
+        [400, 404, 405, 500].includes(candidate?.status) &&
         typeof candidate?.message === 'string' &&
         candidate?.message?.length > 0
     );

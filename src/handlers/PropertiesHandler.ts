@@ -1,13 +1,13 @@
-import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import { BAD_REQUEST, isErrorResponse } from '../utils/ServerResponseUtils';
 import { RequestHandler, RequestMethod } from '../types';
-import { isBadRequest, validateAndGetVideo } from './DetailsHandler';
 import { usePropertiesManager } from '../videos/PropertiesManager';
+import { validateAndGetVideo } from '../utils/ServerRequestUtils';
 
 export const propertiesHandler: RequestHandler & { post: RequestMethod } = {
     path: '/properties',
     post: ({ params, body }) => {
         const video = validateAndGetVideo(params);
-        if (isBadRequest(video)) {
+        if (isErrorResponse(video)) {
             return video;
         }
         if (body === undefined) {

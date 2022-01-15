@@ -1,12 +1,12 @@
 import { propertiesHandler } from './PropertiesHandler';
 import { RequestContext, RequestParams, Json } from '../types';
-import * as dh from './DetailsHandler';
+import * as sru from '../utils/ServerRequestUtils';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 
 describe('PropertiesHandler', () => {
     const path = 'test/test-movie.mp4';
-    jest.spyOn(dh, 'validateAndGetVideo').mockReturnValue({
+    jest.spyOn(sru, 'validateAndGetVideo').mockReturnValue({
         path,
     });
     const propertiesManager = usePropertiesManager();

@@ -1,7 +1,8 @@
 import { join } from 'path';
 import { RequestHandler, RequestMethod } from '../types';
+import { validateAndGetVideo } from '../utils/ServerRequestUtils';
+import { isErrorResponse } from '../utils/ServerResponseUtils';
 import { useSnapshotManager } from '../videos/SnapshotManager';
-import { isBadRequest, validateAndGetVideo } from './DetailsHandler';
 
 const NO_SNAPSHOT_FILE = join('images', 'no-snapshot.png');
 
@@ -9,7 +10,7 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod } = {
     path: '/snapshot',
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
-        if (isBadRequest(video)) {
+        if (isErrorResponse(video)) {
             return video;
         }
         const snapshotManager = useSnapshotManager();

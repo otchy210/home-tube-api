@@ -1,39 +1,14 @@
-import { Values as dh } from '@otchy/sim-doc-db/dist/types';
-import { ErrorResponse, RequestHandler, RequestMethod, RequestParams, VideoDetails } from '../types';
-import logger from '../utils/logger';
-import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import { RequestHandler, RequestMethod, VideoDetails } from '../types';
+import { validateAndGetVideo } from '../utils/ServerRequestUtils';
+import { isErrorResponse } from '../utils/ServerResponseUtils';
 import { useMetaManager } from '../videos/MetaManager';
 import { usePropertiesManager } from '../videos/PropertiesManager';
-import { useVideoCollection } from '../videos/VideoCollection';
-
-export const validateAndGetVideo = (params: RequestParams | undefined): dh | ErrorResponse => {
-    if (!params) {
-        return BAD_REQUEST;
-    }
-    const { id } = params;
-    if (typeof id !== 'number') {
-        return BAD_REQUEST;
-    }
-    const videoCollection = useVideoCollection();
-    let video;
-    try {
-        video = videoCollection.get(id);
-    } catch (e) {
-        logger.info(`Video not found: ${id}`);
-        return BAD_REQUEST;
-    }
-    return video.values;
-};
-
-export const isBadRequest = (video: dh | ErrorResponse): video is ErrorResponse => {
-    return video === BAD_REQUEST;
-};
 
 export const detailsHandler: RequestHandler & { get: RequestMethod } = {
     path: '/details',
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
-        if (isBadRequest(video)) {
+        if (isErrorResponse(video)) {
             return video;
         }
         const path = video.path as string;
