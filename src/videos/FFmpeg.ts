@@ -12,7 +12,9 @@ const getFFmpeg = (): string => {
 
 const getRandomTmpDir = (): string => {
     const envTmp = process.env.TMPDIR ?? process.env.TMP ?? process.env.TEMP ?? '/tmp';
-    return join(envTmp, 'home-tube', Math.random().toString(32).substring(2));
+    const timeStr = Date.now().toString(32);
+    const randStr = Math.random().toString(32).substring(2);
+    return join(envTmp, 'home-tube', `${timeStr}-${randStr}`);
 };
 
 const parseMetaDuration = (line: string): { duration: string; length: number } => {
