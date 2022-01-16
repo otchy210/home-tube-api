@@ -9,7 +9,11 @@ export const searchHandler: RequestHandler & { get: RequestMethod } = {
     path: '/search',
     get: ({ params }) => {
         const videoCollection = useVideoCollection();
-        if (!params || Object.keys(params).length === 0) {
+        if (!params) {
+            return Array.from(videoCollection.getAll());
+        }
+        delete params.page;
+        if (Object.keys(params).length === 0) {
             return Array.from(videoCollection.getAll());
         }
         for (const param of Object.keys(params)) {
