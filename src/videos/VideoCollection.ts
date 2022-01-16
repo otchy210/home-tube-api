@@ -112,10 +112,18 @@ class VideoCollection {
         }
         const doc = results.values().next().value as Document;
         if (properties.stars !== undefined) {
-            doc.values.stars = properties.stars;
+            if (properties.stars === null) {
+                delete doc.values.stars;
+            } else {
+                doc.values.stars = properties.stars;
+            }
         }
         if (properties.tags !== undefined) {
-            doc.values.tags = properties.tags;
+            if (properties.tags === null) {
+                delete doc.values.tags;
+            } else {
+                doc.values.tags = properties.tags;
+            }
         }
         return this.collection.update(doc);
     }

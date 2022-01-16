@@ -84,8 +84,8 @@ export type VideoMeta = {
 export type Stars = 1 | 2 | 3 | 4 | 5;
 
 export type VideoProperties = {
-    stars?: Stars;
-    tags?: string[];
+    stars?: Stars | null;
+    tags?: string[] | null;
 };
 
 export type VideoDetails = VideoValues & VideoMeta & VideoProperties;
