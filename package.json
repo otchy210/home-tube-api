@@ -1,6 +1,6 @@
 {
     "name": "@otchy/home-tube-api",
-    "version": "0.9.23",
+    "version": "0.9.24",
     "description": "API Server for HomeTube",
     "main": "dist/index.js",
     "files": [

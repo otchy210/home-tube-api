@@ -1,7 +1,14 @@
 import logger from '../utils/logger';
-import StorageMonitor, { StorageListener } from './StorageMonitor';
+import StorageMonitor, { StorageListener, StorageMonitorStatus } from './StorageMonitor';
 
 const MONITOR_INTERVAL = 10 * 60; // 10 mins
+
+export type StorageStatus = {
+    [path: string]: {
+        size: number;
+        status: StorageMonitorStatus;
+    };
+};
 
 class StorageManager {
     private monitorMap = new Map<string, StorageMonitor>();
@@ -23,6 +30,17 @@ class StorageManager {
         }
         this.monitorMap.get(path)?.stop();
         this.monitorMap.delete(path);
+    }
+
+    public getStatus(): StorageStatus {
+        return Array.from(this.monitorMap.entries())
+            .sort(([leftPath], [rightPath]) => {
+                return leftPath.localeCompare(rightPath);
+            })
+            .reduce((status, [path, storageMonitor]) => {
+                status[path] = storageMonitor.getStatus();
+                return status;
+            }, {} as StorageStatus);
     }
 }
 

@@ -33,13 +33,15 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
 
 export type StorageListener = (added: Set<string>, removed: Set<string>) => void;
 
+export type StorageMonitorStatus = 'initialized' | 'reading' | 'waiting' | 'stopped';
+
 export default class StorageMonitor {
     private path: string;
     private intervalInSecond: number;
     private current = new Set<string>();
     private listener: StorageListener;
     private tid: NodeJS.Timeout | undefined;
-    private stopped = false;
+    private status: StorageMonitorStatus = 'initialized';
 
     public constructor(path: string, intervalInSecond: number, listener: StorageListener) {
         this.path = path;
@@ -48,6 +50,7 @@ export default class StorageMonitor {
     }
 
     public retrieve(): Promise<Set<string>> {
+        this.status = 'reading';
         return new Promise((resolve) => {
             const set = new Set<string>();
             readDir(this.path, set).then(() => {
@@ -57,9 +60,10 @@ export default class StorageMonitor {
     }
 
     public monitor() {
-        if (this.stopped) {
+        if (this.status === 'stopped') {
             return;
         }
+        this.status = 'waiting';
         this.tid = setTimeout(async () => {
             const previous = this.current;
             const current = await this.retrieve();
@@ -89,6 +93,13 @@ export default class StorageMonitor {
             clearTimeout(this.tid);
         }
         this.listener(new Set(), this.current);
-        this.stopped = true;
+        this.status = 'stopped';
+    }
+
+    public getStatus() {
+        return {
+            size: this.current.size,
+            status: this.status,
+        };
     }
 }
