@@ -127,6 +127,22 @@ class VideoCollection {
         }
         return this.collection.update(doc);
     }
+    public getAllTags(): [string, number][] {
+        const keys = this.collection.getKeys('tags') as Map<string, number>;
+        return Array.from(keys.entries())
+            .filter((entry) => entry[1] > 0)
+            .sort((left, right) => {
+                const lCount = left[1];
+                const rCount = right[1];
+                const diff = rCount - lCount;
+                if (diff !== 0) {
+                    return diff;
+                }
+                const lTag = left[0];
+                const rTag = right[0];
+                return lTag.localeCompare(rTag);
+            });
+    }
     public remove(path: string): void {
         this.collection.removeMatched({ path });
     }
