@@ -46,7 +46,7 @@ export type RequestHandler = {
 
 type JsonPrimitive = string | number | boolean | null;
 
-type JsonArray = JsonPrimitive[] | JsonObject[];
+type JsonArray = JsonPrimitive[] | JsonArray[] | JsonObject[];
 
 type JsonObject = {
     [key: string]: JsonPrimitive | JsonArray | JsonObject;

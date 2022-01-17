@@ -23,6 +23,7 @@ import { propertiesHandler } from './handlers/PropertiesHandler';
 import send = require('send');
 import { snapshotHandler } from './handlers/SnapshotHandler';
 import { videoHandler } from './handlers/VideoHandler';
+import { allTagsHandler } from './handlers/AllTagsHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -155,6 +156,7 @@ const defaultRequestHandlers: RequestHandler[] = [
     propertiesHandler,
     videoHandler,
     thumbnailsHandler,
+    allTagsHandler,
 ];
 
 export default class ApiServer {
