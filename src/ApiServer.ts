@@ -12,7 +12,7 @@ import {
 import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage, RequestHandlerResponse } from './types';
 import { appConfigHandler } from './handlers/AppConfigHandler';
 import { searchHandler } from './handlers/SearchHandler';
-import { StorageManager } from './videos/StorageManager';
+import { useStorageManager } from './videos/StorageManager';
 import logger from './utils/logger';
 import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
@@ -24,6 +24,7 @@ import send = require('send');
 import { snapshotHandler } from './handlers/SnapshotHandler';
 import { videoHandler } from './handlers/VideoHandler';
 import { allTagsHandler } from './handlers/AllTagsHandler';
+import { serverStatusHandler } from './handlers/ServerStatusHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -157,6 +158,7 @@ const defaultRequestHandlers: RequestHandler[] = [
     videoHandler,
     thumbnailsHandler,
     allTagsHandler,
+    serverStatusHandler,
 ];
 
 export default class ApiServer {
@@ -165,7 +167,6 @@ export default class ApiServer {
     private appConfig: AppConfig;
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
-    private storageManager = new StorageManager();
 
     public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
         this.port = serverConfig.port;
@@ -235,6 +236,8 @@ export default class ApiServer {
     }
 
     private updateStorages(current: Storage[], updated: Storage[]) {
+        const storageManager = useStorageManager();
+
         const currentMap = current.reduce((map, curr) => {
             map.set(curr.path, curr);
             return map;
@@ -247,14 +250,14 @@ export default class ApiServer {
         // check removed or disabled
         currentMap.forEach((currentStorage, path) => {
             if (currentStorage.enabled && !updatedMap.get(path)?.enabled) {
-                this.storageManager.remove(path);
+                storageManager.remove(path);
             }
         });
 
         // check added or enabled
         updatedMap.forEach((updatedStorage, path) => {
             if (updatedStorage.enabled && !currentMap.get(path)?.enabled) {
-                this.storageManager.add(path, this.createStorageListener());
+                storageManager.add(path, this.createStorageListener());
             }
         });
     }

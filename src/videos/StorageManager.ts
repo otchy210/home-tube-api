@@ -3,7 +3,7 @@ import StorageMonitor, { StorageListener } from './StorageMonitor';
 
 const MONITOR_INTERVAL = 10 * 60; // 10 mins
 
-export class StorageManager {
+class StorageManager {
     private monitorMap = new Map<string, StorageMonitor>();
 
     public add(path: string, storageListener: StorageListener): void {
@@ -25,3 +25,9 @@ export class StorageManager {
         this.monitorMap.delete(path);
     }
 }
+
+const instance = new StorageManager();
+
+export const useStorageManager = () => {
+    return instance;
+};

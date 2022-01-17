@@ -16,13 +16,16 @@ export type ConsumeParams = {
     options?: Record<string, string>;
 };
 
-type Status = 'PROCESSING';
+export type FFmpegWoekerStatus = {
+    count: number;
+    current: string | null;
+};
 
 export default abstract class FFmpegWorker {
     protected ffmpeg: FFmpeg;
     private queue: FFmpegRequest[] = [];
     private tid: NodeJS.Timeout | undefined;
-    private statuses = new Map<string, Status>();
+    private current: string | undefined;
 
     constructor(ffmpeg?: string) {
         this.ffmpeg = new FFmpeg(ffmpeg);
@@ -47,16 +50,15 @@ export default abstract class FFmpegWorker {
             return;
         }
         const { path, options } = request;
-        const status = this.statuses.get(path);
-        if (status === 'PROCESSING') {
+        if (this.current === path) {
             this.check();
             return;
         }
-        this.statuses.set(path, 'PROCESSING');
+        this.current = path;
 
         const { name, metaDir } = parsePath(path);
         mkdir(metaDir, { recursive: true }).then(() => {
-            const params = {
+            const params: ConsumeParams = {
                 path,
                 name,
                 metaDir,
@@ -65,12 +67,12 @@ export default abstract class FFmpegWorker {
             this.consume(params)
                 .then(() => {
                     this.check();
-                    this.statuses.delete(path);
+                    this.current = undefined;
                 })
                 .catch((e) => {
                     console.error(e);
                     this.check();
-                    this.statuses.delete(path);
+                    this.current = undefined;
                 });
         });
     }
@@ -81,5 +83,12 @@ export default abstract class FFmpegWorker {
         if (this.tid !== undefined) {
             clearTimeout(this.tid);
         }
+    }
+
+    public getStatus(): FFmpegWoekerStatus {
+        return {
+            count: this.queue.length,
+            current: this.current ?? null,
+        };
     }
 }
