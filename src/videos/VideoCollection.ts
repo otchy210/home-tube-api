@@ -1,7 +1,7 @@
 import { Collection } from '@otchy/sim-doc-db';
 import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
 import { basename } from 'path';
-import { VideoMeta, VideoProperties } from '../types';
+import { AllTags, VideoMeta, VideoProperties } from '../types';
 
 type LengthTag = {
     length: number;
@@ -127,7 +127,7 @@ class VideoCollection {
         }
         return this.collection.update(doc);
     }
-    public getAllTags(): [string, number][] {
+    public getAllTags(): AllTags {
         const keys = this.collection.getKeys('tags') as Map<string, number>;
         return Array.from(keys.entries())
             .filter((entry) => entry[1] > 0)

@@ -90,6 +90,8 @@ export type VideoProperties = {
 
 export type VideoDetails = VideoValues & VideoMeta & VideoProperties;
 
+export type AllTags = [string, number][];
+
 export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta> => {
     if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec) {
         return true;
