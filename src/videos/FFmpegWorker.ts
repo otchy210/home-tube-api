@@ -50,10 +50,6 @@ export default abstract class FFmpegWorker {
             return;
         }
         const { path, options } = request;
-        if (this.current === path) {
-            this.check();
-            return;
-        }
         this.current = path;
 
         const { name, metaDir } = parsePath(path);
@@ -66,13 +62,13 @@ export default abstract class FFmpegWorker {
             };
             this.consume(params)
                 .then(() => {
-                    this.check();
                     this.current = undefined;
+                    this.check();
                 })
                 .catch((e) => {
                     console.error(e);
-                    this.check();
                     this.current = undefined;
+                    this.check();
                 });
         });
     }
