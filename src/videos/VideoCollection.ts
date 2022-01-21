@@ -75,12 +75,11 @@ class VideoCollection {
         return this.collection.getAll();
     }
     public add(path: string): void {
-        const normalizedPath = path.normalize();
-        const key = sha256(normalizedPath);
-        const name = basename(normalizedPath);
-        const names = getNames(normalizedPath);
+        const key = sha256(path);
+        const name = basename(path);
+        const names = getNames(path);
         this.collection.add({
-            values: { key, path: normalizedPath, name, names },
+            values: { key, path, name, names },
         });
     }
     public updateMeta(key: string, meta: VideoMeta): Document | undefined {
