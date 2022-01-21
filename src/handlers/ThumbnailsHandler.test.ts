@@ -30,7 +30,7 @@ describe('ThumbnailsHandler', () => {
             });
             const mockedContext = {
                 params: {
-                    id: 1,
+                    key: 'key',
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;
@@ -50,7 +50,7 @@ describe('ThumbnailsHandler', () => {
             mockedGetThumbnails.mockReturnValue('/dummy/thumbnails_001.jpg');
             const mockedContext = {
                 params: {
-                    id: 1,
+                    key: 'key',
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;

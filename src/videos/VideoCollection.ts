@@ -64,8 +64,12 @@ const fields: Field[] = [
 class VideoCollection {
     private collection = new Collection(fields);
 
-    public get(id: number): Document {
-        return this.collection.get(id);
+    public get(key: string): Document {
+        const set = this.collection.find({ key });
+        if (set.size === 0) {
+            throw new Error(`Document not found: key = ${key}`);
+        }
+        return set.values().next().value;
     }
     public getAll(): Set<Document> {
         return this.collection.getAll();

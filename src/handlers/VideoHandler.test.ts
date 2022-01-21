@@ -19,7 +19,7 @@ describe('videoHandler', () => {
             });
             const mockedContext = {
                 params: {
-                    id: 1,
+                    key: 'key',
                 } as RequestParams,
             } as RequestContext;
             expect(videoHandler.get(mockedContext)).toBe('/dummy/dummy.mp4');

@@ -23,7 +23,7 @@ describe('validateAndGetVideo', () => {
     });
     it('returns video properly', () => {
         const mockedParams = {
-            id: 1,
+            key: 'key',
             minute: 0,
         } as RequestParams;
         const videoCollection = useVideoCollection();

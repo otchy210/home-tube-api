@@ -20,7 +20,7 @@ describe('SnapshotHandler', () => {
             });
             const mockedContext = {
                 params: {
-                    id: 1,
+                    key: 'key',
                 } as RequestParams,
             } as RequestContext;
             const response = snapshotHandler.get(mockedContext);
@@ -44,7 +44,7 @@ describe('SnapshotHandler', () => {
             mockedGetSnapshot.mockReturnValue('/dummy/snapshot.jpg');
             const mockedContext = {
                 params: {
-                    id: 1,
+                    key: 'key',
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;

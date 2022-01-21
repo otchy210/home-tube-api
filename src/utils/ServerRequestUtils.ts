@@ -8,16 +8,16 @@ export const validateAndGetVideo = (params: RequestParams | undefined): sru | Er
     if (!params) {
         return BAD_REQUEST;
     }
-    const { id } = params;
-    if (typeof id !== 'number') {
+    const { key } = params;
+    if (typeof key !== 'string') {
         return BAD_REQUEST;
     }
     const videoCollection = useVideoCollection();
     let video;
     try {
-        video = videoCollection.get(id);
+        video = videoCollection.get(key);
     } catch (e) {
-        logger.info(`Video not found: ${id}`);
+        logger.info(`Video not found: ${key}`);
         return BAD_REQUEST;
     }
     return video.values;
