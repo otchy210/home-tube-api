@@ -19,7 +19,7 @@ class PropertiesManager {
         }
         const properties = JSON.parse(readFileSync(propertiesPath).toString()) as VideoProperties;
         const videoCollection = useVideoCollection();
-        videoCollection.updateProperties(path, properties);
+        videoCollection.updateProperties({ path }, properties);
         return properties;
     }
     public update(path: string, properties: VideoProperties): VideoProperties {
@@ -27,7 +27,7 @@ class PropertiesManager {
         const propertiesPath = getPropertiesPath(metaDir);
         writeFileSync(propertiesPath, JSON.stringify(properties));
         const videoCollection = useVideoCollection();
-        videoCollection.updateProperties(path, properties);
+        videoCollection.updateProperties({ path }, properties);
         return properties;
     }
 }

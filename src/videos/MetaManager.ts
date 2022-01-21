@@ -35,7 +35,7 @@ class MetaManager extends FFmpegWorker {
         const metaPath = getMetaPath(metaDir);
         await writeFile(metaPath, JSON.stringify(meta));
         const videoCollection = useVideoCollection();
-        videoCollection.updateMeta(path, meta);
+        videoCollection.updateMeta({ path }, meta);
         enqueuSubTasksAsNeeded(path);
     }
 
@@ -51,7 +51,7 @@ class MetaManager extends FFmpegWorker {
                 .then((buf) => {
                     const meta = JSON.parse(buf.toString());
                     const videoCollection = useVideoCollection();
-                    videoCollection.updateMeta(path, meta);
+                    videoCollection.updateMeta({ path }, meta);
                     enqueuSubTasksAsNeeded(path);
                     resolve(meta);
                 })

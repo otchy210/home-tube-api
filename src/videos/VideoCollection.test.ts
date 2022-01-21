@@ -41,13 +41,9 @@ describe('VideoCollection', () => {
         videoCollection.add('/path/to/2.mp4');
         videoCollection.add('/path/to/3.mp4');
 
-        const key1 = sha256('/path/to/1.mp4');
-        const key2 = sha256('/path/to/2.mp4');
-        const key3 = sha256('/path/to/3.mp4');
-
-        videoCollection.updateProperties(key1, { tags: ['tag1', 'tag2', 'tag3'] });
-        videoCollection.updateProperties(key2, { tags: ['tag2', 'tag3', 'tag4'] });
-        videoCollection.updateProperties(key3, { tags: ['tag2', 'tag4', 'tag6'] });
+        videoCollection.updateProperties({ path: '/path/to/1.mp4' }, { tags: ['tag1', 'tag2', 'tag3'] });
+        videoCollection.updateProperties({ key: sha256('/path/to/2.mp4') }, { tags: ['tag2', 'tag3', 'tag4'] });
+        videoCollection.updateProperties({ path: '/path/to/3.mp4' }, { tags: ['tag2', 'tag4', 'tag6'] });
 
         expect(videoCollection.getAllTags()).toStrictEqual({ tag1: 1, tag2: 3, tag3: 2, tag4: 2, tag6: 1 });
 

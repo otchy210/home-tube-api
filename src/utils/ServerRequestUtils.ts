@@ -1,10 +1,10 @@
-import { Values as sru } from '@otchy/sim-doc-db/dist/types';
+import { Values } from '@otchy/sim-doc-db/dist/types';
 import { ErrorResponse, RequestParams } from '../types';
 import logger from '../utils/logger';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { useVideoCollection } from '../videos/VideoCollection';
 
-export const validateAndGetVideo = (params: RequestParams | undefined): sru | ErrorResponse => {
+export const validateAndGetVideo = (params: RequestParams | undefined): Values | ErrorResponse => {
     if (!params) {
         return BAD_REQUEST;
     }

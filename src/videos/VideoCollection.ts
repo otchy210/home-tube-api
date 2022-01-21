@@ -82,8 +82,8 @@ class VideoCollection {
             values: { key, path, name, names },
         });
     }
-    public updateMeta(key: string, meta: VideoMeta): Document | undefined {
-        const results = this.collection.find({ key });
+    public updateMeta(query: Query, meta: VideoMeta): Document | undefined {
+        const results = this.collection.find(query);
         if (results.size === 0) {
             return;
         }
@@ -112,8 +112,8 @@ class VideoCollection {
         }
         return this.collection.update(doc);
     }
-    public updateProperties(key: string, properties: VideoProperties): Document | undefined {
-        const results = this.collection.find({ key });
+    public updateProperties(query: Query, properties: VideoProperties): Document | undefined {
+        const results = this.collection.find(query);
         if (results.size === 0) {
             return;
         }
