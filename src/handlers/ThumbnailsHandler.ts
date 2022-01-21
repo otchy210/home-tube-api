@@ -1,4 +1,4 @@
-import { RequestHandler, RequestMethod, RequestParams } from '../types';
+import { RequestHandler, RequestMethod, RequestParams, StaticFileResponse } from '../types';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
 import { BAD_REQUEST, isErrorResponse, NOT_FOUND } from '../utils/ServerResponseUtils';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
@@ -20,6 +20,10 @@ export const thumbnailsHandler: RequestHandler & { get: RequestMethod } = {
         if (!thumbnailsPath) {
             return NOT_FOUND;
         }
-        return thumbnailsPath;
+        const response: StaticFileResponse = {
+            path: thumbnailsPath,
+            maxAge: 60 * 60 * 24,
+        };
+        return response;
     },
 };

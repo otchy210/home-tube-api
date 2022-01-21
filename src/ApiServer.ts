@@ -3,6 +3,7 @@ import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/A
 import {
     buildJsonResponseHeaders,
     isErrorResponse,
+    isStaticFileResponse,
     writeBadRequest,
     writeErrorResponse,
     writeInternalServerError,
@@ -85,9 +86,14 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
             writeBadRequest(response, origin);
         } else if (isErrorResponse(handlerResponse)) {
             writeErrorResponse(response, handlerResponse, origin);
-        } else if (typeof handlerResponse === 'string') {
-            // static file case
-            send(context.request, handlerResponse).pipe(response);
+        } else if (isStaticFileResponse(handlerResponse)) {
+            const options: send.SendOptions = {};
+            if (handlerResponse.maxAge > 0) {
+                options.cacheControl = true;
+                options.maxAge = handlerResponse.maxAge * 1000;
+                options.immutable = true;
+            }
+            send(context.request, handlerResponse.path, options).pipe(response);
         } else {
             response.writeHead(200, buildJsonResponseHeaders(origin));
             response.write(JSON.stringify(handlerResponse));

@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { RequestHandler, RequestMethod } from '../types';
+import { RequestHandler, RequestMethod, StaticFileResponse } from '../types';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
 import { isErrorResponse } from '../utils/ServerResponseUtils';
 import { useSnapshotManager } from '../videos/SnapshotManager';
@@ -19,6 +19,10 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod } = {
         if (!snapshotPath) {
             return join(process.cwd(), NO_SNAPSHOT_FILE);
         }
-        return snapshotPath;
+        const response: StaticFileResponse = {
+            path: snapshotPath,
+            maxAge: 60 * 10,
+        };
+        return response;
     },
 };

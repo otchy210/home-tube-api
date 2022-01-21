@@ -1,5 +1,5 @@
 import { ServerResponse } from 'http';
-import { ErrorResponse } from '../types';
+import { ErrorResponse, StaticFileResponse } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isErrorResponse = (candidate: any): candidate is ErrorResponse => {
@@ -9,6 +9,11 @@ export const isErrorResponse = (candidate: any): candidate is ErrorResponse => {
         typeof candidate?.message === 'string' &&
         candidate?.message?.length > 0
     );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isStaticFileResponse = (candidate: any): candidate is StaticFileResponse => {
+    return Object.keys(candidate).length === 2 && typeof candidate?.path === 'string' && typeof candidate?.maxAge === 'number';
 };
 
 export const BAD_REQUEST = {
