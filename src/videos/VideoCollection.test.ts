@@ -1,3 +1,4 @@
+import { sha256 } from '../utils/StringUtils';
 import { getNames, useVideoCollection } from './VideoCollection';
 
 describe('getNames', () => {
@@ -27,6 +28,7 @@ describe('VideoCollection', () => {
         const results = videoCollection.find({ names: '動画' });
         expect(results.size).toBe(1);
         expect(Array.from(results)[0].values).toStrictEqual({
+            key: 'LmScC35-sEgPDA08IQLe3U02x4tUd3PXaJ32QopI2tQ',
             path: '/path/to/日本語動画.mp4',
             name: '日本語動画.mp4',
             names: ['path', 'to', '日本語動画'],
@@ -39,9 +41,13 @@ describe('VideoCollection', () => {
         videoCollection.add('/path/to/2.mp4');
         videoCollection.add('/path/to/3.mp4');
 
-        videoCollection.updateProperties('/path/to/1.mp4', { tags: ['tag1', 'tag2', 'tag3'] });
-        videoCollection.updateProperties('/path/to/2.mp4', { tags: ['tag2', 'tag3', 'tag4'] });
-        videoCollection.updateProperties('/path/to/3.mp4', { tags: ['tag2', 'tag4', 'tag6'] });
+        const key1 = sha256('/path/to/1.mp4');
+        const key2 = sha256('/path/to/2.mp4');
+        const key3 = sha256('/path/to/3.mp4');
+
+        videoCollection.updateProperties(key1, { tags: ['tag1', 'tag2', 'tag3'] });
+        videoCollection.updateProperties(key2, { tags: ['tag2', 'tag3', 'tag4'] });
+        videoCollection.updateProperties(key3, { tags: ['tag2', 'tag4', 'tag6'] });
 
         expect(videoCollection.getAllTags()).toStrictEqual({ tag1: 1, tag2: 3, tag3: 2, tag4: 2, tag6: 1 });
 

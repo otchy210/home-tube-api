@@ -2,6 +2,7 @@ import { Collection } from '@otchy/sim-doc-db';
 import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
 import { basename } from 'path';
 import { AllTags, VideoMeta, VideoProperties } from '../types';
+import { sha256 } from '../utils/StringUtils';
 
 type LengthTag = {
     length: number;
@@ -47,6 +48,7 @@ export const getNames = (path: string): string[] => {
 };
 
 const fields: Field[] = [
+    { name: 'key', type: 'tag', indexed: true },
     { name: 'path', type: 'tag', indexed: true },
     { name: 'name', type: 'string', indexed: false },
     { name: 'names', type: 'string[]', indexed: true },
@@ -69,14 +71,16 @@ class VideoCollection {
         return this.collection.getAll();
     }
     public add(path: string): void {
-        const name = basename(path);
-        const names = getNames(path);
+        const normalizedPath = path.normalize();
+        const key = sha256(normalizedPath);
+        const name = basename(normalizedPath);
+        const names = getNames(normalizedPath);
         this.collection.add({
-            values: { path, name, names },
+            values: { key, path: normalizedPath, name, names },
         });
     }
-    public updateMeta(path: string, meta: VideoMeta): Document | undefined {
-        const results = this.collection.find({ path });
+    public updateMeta(key: string, meta: VideoMeta): Document | undefined {
+        const results = this.collection.find({ key });
         if (results.size === 0) {
             return;
         }
@@ -105,8 +109,8 @@ class VideoCollection {
         }
         return this.collection.update(doc);
     }
-    public updateProperties(path: string, properties: VideoProperties): Document | undefined {
-        const results = this.collection.find({ path });
+    public updateProperties(key: string, properties: VideoProperties): Document | undefined {
+        const results = this.collection.find({ key });
         if (results.size === 0) {
             return;
         }
