@@ -22,7 +22,10 @@ describe('videoHandler', () => {
                     key: 'key',
                 } as RequestParams,
             } as RequestContext;
-            expect(videoHandler.get(mockedContext)).toBe('/dummy/dummy.mp4');
+            expect(videoHandler.get(mockedContext)).toStrictEqual({
+                maxAge: 0,
+                path: '/dummy/dummy.mp4',
+            });
         });
     });
     afterAll(() => {

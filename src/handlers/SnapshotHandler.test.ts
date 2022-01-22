@@ -48,7 +48,7 @@ describe('SnapshotHandler', () => {
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;
-            expect(snapshotHandler.get(mockedContext)).toBe('/dummy/snapshot.jpg');
+            expect(snapshotHandler.get(mockedContext)).toStrictEqual({ maxAge: 600, path: '/dummy/snapshot.jpg' });
         });
     });
     afterAll(() => {

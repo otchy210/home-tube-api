@@ -54,7 +54,10 @@ describe('ThumbnailsHandler', () => {
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe('/dummy/thumbnails_001.jpg');
+            expect(thumbnailsHandler.get(mockedContext)).toStrictEqual({
+                maxAge: 86400,
+                path: '/dummy/thumbnails_001.jpg',
+            });
         });
     });
     afterAll(() => {

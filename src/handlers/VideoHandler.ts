@@ -1,4 +1,4 @@
-import { RequestHandler, RequestMethod } from '../types';
+import { RequestHandler, RequestMethod, StaticFileResponse } from '../types';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
 import { isErrorResponse } from '../utils/ServerResponseUtils';
 
@@ -9,6 +9,10 @@ export const videoHandler: RequestHandler & { get: RequestMethod } = {
         if (isErrorResponse(video)) {
             return video;
         }
-        return video.path as string;
+        const response: StaticFileResponse = {
+            path: video.path as string,
+            maxAge: 0,
+        };
+        return response;
     },
 };
