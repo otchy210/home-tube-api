@@ -5,6 +5,7 @@ import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
 import logger from '../utils/logger';
 import { parsePath } from '../utils/PathUtils';
+import { formatTimeInSecond } from '../utils/TimeUtils';
 
 const getFFmpeg = (): string => {
     return execSync('which ffmpeg').toString().trim();
@@ -21,18 +22,7 @@ const parseMetaDuration = (line: string): { duration: string; length: number } =
     const duration = line.trim().split(' ')[1].split(',')[0];
     const [hours, mins, secs] = duration.split(':');
     const length = parseInt(hours) * 3600 + parseInt(mins) * 60 + parseFloat(secs);
-    return { duration: formatDuration(duration), length };
-};
-
-const formatDuration = (duration: string): string => {
-    const [hhmmss] = duration.split('.');
-    let result = hhmmss;
-    let c = result.charAt(0);
-    while (c === '0' || c === ':') {
-        result = result.substring(1);
-        c = result.charAt(0);
-    }
-    return result;
+    return { duration: formatTimeInSecond(length), length };
 };
 
 const parseMetaVideo = (line: string): { vcodec: string; width: number; height: number } => {

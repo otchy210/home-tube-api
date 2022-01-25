@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
+import { formatTimeInSecond } from '../utils/TimeUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { usePropertiesManager } from './PropertiesManager';
 import { useSnapshotManager } from './SnapshotManager';
@@ -49,7 +50,15 @@ class MetaManager extends FFmpegWorker {
         return new Promise((resolve) => {
             readFile(metaPath)
                 .then((buf) => {
-                    const meta = JSON.parse(buf.toString());
+                    const meta = JSON.parse(buf.toString()) as VideoMeta;
+                    // TODO: remove temporary solution to update existing meta
+                    if (meta.length) {
+                        const formatedDuration = formatTimeInSecond(meta.length);
+                        if (meta.duration && meta.duration !== formatedDuration) {
+                            const updatedMeta = { ...meta, duration: formatedDuration };
+                            writeFile(metaPath, JSON.stringify(updatedMeta));
+                        }
+                    }
                     const videoCollection = useVideoCollection();
                     videoCollection.updateMeta({ path }, meta);
                     enqueuSubTasksAsNeeded(path);
