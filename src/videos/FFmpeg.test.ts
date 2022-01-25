@@ -22,7 +22,7 @@ describe('FFmpeg', () => {
             expect(ffmpeg.getMeta('test/test-movie.mp4')).toStrictEqual({
                 acodec: 'aac',
                 vcodec: 'h264',
-                duration: '3',
+                duration: '0:03',
                 height: 1080,
                 length: 3.08,
                 name: 'test-movie.mp4',
@@ -31,7 +31,7 @@ describe('FFmpeg', () => {
             expect(ffmpeg.getMeta('test/test-movie.avi')).toStrictEqual({
                 acodec: 'mp3',
                 vcodec: 'mpeg4',
-                duration: '3',
+                duration: '0:03',
                 height: 1080,
                 length: 3.1,
                 name: 'test-movie.avi',
@@ -40,7 +40,7 @@ describe('FFmpeg', () => {
             expect(ffmpeg.getMeta('test/test-movie.wmv')).toStrictEqual({
                 acodec: 'wmav2',
                 vcodec: 'msmpeg4v3',
-                duration: '3',
+                duration: '0:03',
                 height: 1080,
                 length: 3.14,
                 name: 'test-movie.wmv',

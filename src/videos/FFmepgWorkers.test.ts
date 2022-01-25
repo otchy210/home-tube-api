@@ -19,7 +19,7 @@ describe('FFmpegWorkers', () => {
                 metaManager.get('test/test-movie.mp4', false).then((meta) => {
                     expect(meta).toStrictEqual({
                         acodec: 'aac',
-                        duration: '3',
+                        duration: '0:03',
                         height: 1080,
                         length: 3.08,
                         name: 'test-movie.mp4',

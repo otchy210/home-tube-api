@@ -29,7 +29,7 @@ describe('detailsHandler', () => {
             } as RequestContext;
             expect(detailsHandler.get(mockedContext)).toStrictEqual({
                 acodec: 'aac',
-                duration: '3',
+                duration: '0:03',
                 height: 1080,
                 length: 3.08,
                 name: 'test-movie.mp4',
