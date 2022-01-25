@@ -17,7 +17,12 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod } = {
         const path = video.path as string;
         const snapshotPath = snapshotManager.get(path);
         if (!snapshotPath) {
-            return join(process.cwd(), NO_SNAPSHOT_FILE);
+            const noSnapshotPath = join(process.cwd(), NO_SNAPSHOT_FILE);
+            const response: StaticFileResponse = {
+                path: noSnapshotPath,
+                maxAge: 60,
+            };
+            return response;
         }
         const response: StaticFileResponse = {
             path: snapshotPath,

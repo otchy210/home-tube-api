@@ -1,4 +1,4 @@
-import { RequestContext, RequestParams } from '../types';
+import { RequestContext, RequestParams, StaticFileResponse } from '../types';
 import { snapshotHandler } from './SnapshotHandler';
 import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
 import { useVideoCollection } from '../videos/VideoCollection';
@@ -23,12 +23,9 @@ describe('SnapshotHandler', () => {
                     key: 'key',
                 } as RequestParams,
             } as RequestContext;
-            const response = snapshotHandler.get(mockedContext);
-            if (typeof response !== 'string') {
-                fail();
-            } else {
-                expect(response.endsWith('/images/no-snapshot.png')).toBe(true);
-            }
+            const result = snapshotHandler.get(mockedContext) as StaticFileResponse;
+            expect(result.maxAge).toBe(60);
+            expect(result.path.endsWith('/images/no-snapshot.png')).toBe(true);
         });
         it('returns thumbnails path when thumbnails file found', () => {
             const videoCollection = useVideoCollection();
