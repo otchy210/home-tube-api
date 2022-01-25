@@ -1,14 +1,8 @@
+import { StorageStatus } from '../types';
 import logger from '../utils/logger';
-import StorageMonitor, { StorageListener, StorageMonitorStatus } from './StorageMonitor';
+import StorageMonitor, { StorageListener } from './StorageMonitor';
 
 const MONITOR_INTERVAL = 10 * 60; // 10 mins
-
-export type StorageStatus = {
-    [path: string]: {
-        size: number;
-        status: StorageMonitorStatus;
-    };
-};
 
 class StorageManager {
     private monitorMap = new Map<string, StorageMonitor>();

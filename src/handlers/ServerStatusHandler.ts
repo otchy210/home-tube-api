@@ -1,18 +1,9 @@
-import { RequestHandler, RequestMethod } from '../types';
-import { FFmpegWoekerStatus } from '../videos/FFmpegWorker';
+import { RequestHandler, RequestMethod, ServerStatus } from '../types';
 import { useMetaManager } from '../videos/MetaManager';
 import { useSnapshotManager } from '../videos/SnapshotManager';
-import { StorageStatus, useStorageManager } from '../videos/StorageManager';
+import { useStorageManager } from '../videos/StorageManager';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
 import { useVideoCollection } from '../videos/VideoCollection';
-
-type ServerStatus = {
-    storages: StorageStatus;
-    indexedVideo: number;
-    meta: FFmpegWoekerStatus;
-    thumbnails: FFmpegWoekerStatus;
-    snapshot: FFmpegWoekerStatus;
-};
 
 export const serverStatusHandler: RequestHandler & { get: RequestMethod } = {
     path: '/serverStatus',

@@ -104,3 +104,25 @@ export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta
     }
     return false;
 };
+
+export type StorageMonitorStatus = 'initialized' | 'reading' | 'waiting' | 'stopped';
+
+export type StorageStatus = {
+    [path: string]: {
+        size: number;
+        status: StorageMonitorStatus;
+    };
+};
+
+export type FFmpegWoekerStatus = {
+    count: number;
+    current: string | null;
+};
+
+export type ServerStatus = {
+    storages: StorageStatus;
+    indexedVideo: number;
+    meta: FFmpegWoekerStatus;
+    thumbnails: FFmpegWoekerStatus;
+    snapshot: FFmpegWoekerStatus;
+};

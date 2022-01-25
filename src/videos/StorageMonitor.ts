@@ -1,5 +1,6 @@
 import { readdir } from 'fs/promises';
 import { join } from 'path';
+import { StorageMonitorStatus } from '../types';
 
 // https://en.wikipedia.org/wiki/Video_file_format
 const MOVIE_EXTENSIONS = new Set(['webm', 'mkv', 'flv', 'avi', 'mov', 'wmv', 'rm', 'mp4', 'm4v', 'mpg', 'mpg2', 'mpeg', 'mpeg2', '3gp']);
@@ -32,8 +33,6 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
 };
 
 export type StorageListener = (added: Set<string>, removed: Set<string>) => void;
-
-export type StorageMonitorStatus = 'initialized' | 'reading' | 'waiting' | 'stopped';
 
 export default class StorageMonitor {
     private path: string;

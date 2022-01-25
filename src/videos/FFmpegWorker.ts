@@ -1,4 +1,5 @@
 import { mkdir } from 'fs/promises';
+import { FFmpegWoekerStatus } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';
 
@@ -14,11 +15,6 @@ export type ConsumeParams = {
     name: string;
     metaDir: string;
     options?: Record<string, string>;
-};
-
-export type FFmpegWoekerStatus = {
-    count: number;
-    current: string | null;
 };
 
 export default abstract class FFmpegWorker {
