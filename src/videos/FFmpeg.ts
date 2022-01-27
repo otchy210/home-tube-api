@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import { copyFile, mkdir } from 'fs/promises';
 import { basename, join } from 'path';
+import { SNAPSHOT, THUMBNAIL } from '../const';
 import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
 import logger from '../utils/logger';
@@ -57,20 +58,8 @@ export const formatSeekTime = (positoin: number): string => {
         .join(':');
 };
 
-export const THUMBNAIL = {
-    SIZE: 240,
-    ROW_SIZE: 60,
-    JPEG_QUALITY: 5,
-};
-
 export const getThumbnailsName = (index: number): string => {
     return `thumbnails_${String(index).padStart(3, '0')}.jpg`;
-};
-
-export const SNAPSHOT = {
-    FILE: 'snapshot.jpg',
-    SIZE: 720,
-    JPEG_QUALITY: 1,
 };
 
 export default class FFmpeg {

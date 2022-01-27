@@ -1,7 +1,7 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { SNAPSHOT } from '../const';
 import { parsePath } from '../utils/PathUtils';
-import { SNAPSHOT } from './FFmpeg';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { useMetaManager } from './MetaManager';
 
