@@ -57,7 +57,7 @@ export const formatSeekTime = (positoin: number): string => {
         .join(':');
 };
 
-const THUMBNAIL = {
+export const THUMBNAIL = {
     SIZE: 240,
     ROW_SIZE: 60,
     JPEG_QUALITY: 5,
