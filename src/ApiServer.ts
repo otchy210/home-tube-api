@@ -40,10 +40,11 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
         .split('&')
         .map((pairStr) => pairStr.split('='))
         .reduce<RequestParams>((map, [key, value]) => {
-            if (map[key] !== undefined) {
-                throw new Error(`Duplicate param name is not allowed: ${key}`);
-            }
             const decodedValue = decodeURIComponent(value);
+            if (map[key] !== undefined) {
+                console.warn(`Duplicate param name is not allowed: "${key}" has "${map[key]}" already / skipped "${decodedValue}"`);
+                return map;
+            }
             try {
                 map[key] = JSON.parse(decodedValue);
             } catch {
