@@ -1,34 +1,9 @@
 import { Collection } from '@otchy/sim-doc-db';
 import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
 import { basename } from 'path';
+import { LENGTH_TAGS, SIZE_TAGS } from '../const';
 import { AllTags, VideoMeta, VideoProperties } from '../types';
 import { sha256 } from '../utils/StringUtils';
-
-type LengthTag = {
-    length: number;
-    tag: string;
-    label: string;
-};
-export const LENGTH_TAGS: LengthTag[] = [
-    { length: 30, tag: 'moment', label: 'Moment (<=30s)' },
-    { length: 60 * 5, tag: 'short', label: 'Short (<=5m)' },
-    { length: 60 * 20, tag: 'middle', label: 'Middle (<=20m)' },
-    { length: 60 * 60, tag: 'long', label: 'Long (<=1h)' },
-    { length: 60 * 60 * 24, tag: 'movie', label: 'Movie (1h+)' },
-];
-
-type SizeTag = {
-    size: number;
-    tag: string;
-    label: string;
-};
-export const SIZE_TAGS: SizeTag[] = [
-    { size: 720, tag: 'sd', label: 'SD (~720x480)' },
-    { size: 1280, tag: 'hd', label: 'HD (~1280x720)' },
-    { size: 1920, tag: 'fhd', label: 'Full HD (~1920x1080)' },
-    { size: 3840, tag: '4k', label: '4K (~3840x2160)' },
-    { size: 7680, tag: '8k', label: '8K (~7680x4320)' },
-];
 
 const PATH_DELIM = /[/\\]+/;
 

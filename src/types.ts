@@ -126,3 +126,15 @@ export type ServerStatus = {
     thumbnails: FFmpegWoekerStatus;
     snapshot: FFmpegWoekerStatus;
 };
+
+export type LengthTag = {
+    length: number;
+    tag: string;
+    label: string;
+};
+
+export type SizeTag = {
+    size: number;
+    tag: string;
+    label: string;
+};
