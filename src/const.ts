@@ -1,4 +1,4 @@
-import { LengthTag, SizeTag } from './types';
+import { LengthTag, SizeTag, Stars } from './types';
 
 export const THUMBNAIL = {
     SIZE: 240,
@@ -11,6 +11,8 @@ export const SNAPSHOT = {
     SIZE: 720,
     JPEG_QUALITY: 1,
 };
+
+export const POSSIBLE_STARS: Stars[] = [1, 2, 3, 4, 5];
 
 export const LENGTH_TAGS: LengthTag[] = [
     { length: 30, tag: 'moment', label: 'Moment (<=30s)' },
