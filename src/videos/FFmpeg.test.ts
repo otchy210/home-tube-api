@@ -84,4 +84,28 @@ describe('FFmpeg', () => {
             });
         });
     });
+
+    describe('updateSnapshot', () => {
+        it('works', (done) => {
+            const path = 'test/test-movie.wmv';
+            const meta = ffmpeg.getMeta(path);
+            if (!isRequiredVideoMeta(meta)) {
+                throw new Error();
+            }
+            ffmpeg
+                .updateSnapshot(
+                    path,
+                    meta,
+                    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQAAAAA3iMLMAAAAEklEQVR4AWPg50egDx/gCJc4ACpfD/HR6M3qAAAAAElFTkSuQmCC'
+                )
+                .then(() => {
+                    const { metaDir } = parsePath(path);
+                    const snapshotPath = join(metaDir, 'snapshot.jpg');
+                    expect(existsSync(snapshotPath)).toBe(true);
+                    unlinkSync(snapshotPath);
+                    rmdirSync(metaDir);
+                    done();
+                });
+        });
+    });
 });

@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { copyFile, mkdir } from 'fs/promises';
+import { copyFile, mkdir, writeFile } from 'fs/promises';
 import { basename, join } from 'path';
 import { SNAPSHOT, THUMBNAIL } from '../const';
 import { VideoMeta } from '../types';
@@ -12,11 +12,16 @@ const getFFmpeg = (): string => {
     return execSync('which ffmpeg').toString().trim();
 };
 
-const getRandomTmpDir = (): string => {
+const getRandomTmpDir = (): Promise<string> => {
     const envTmp = process.env.TMPDIR ?? process.env.TMP ?? process.env.TEMP ?? '/tmp';
     const timeStr = Date.now().toString(32);
     const randStr = Math.random().toString(32).substring(2);
-    return join(envTmp, 'home-tube', `${timeStr}-${randStr}`);
+    const tmpDirPath = join(envTmp, 'home-tube', `${timeStr}-${randStr}`);
+    return new Promise<string>((resolve) => {
+        mkdir(tmpDirPath, { recursive: true }).then(() => {
+            resolve(tmpDirPath);
+        });
+    });
 };
 
 const parseMetaDuration = (line: string): { duration: string; length: number } => {
@@ -62,6 +67,16 @@ export const getThumbnailsName = (index: number): string => {
     return `thumbnails_${String(index).padStart(3, '0')}.jpg`;
 };
 
+const SUPPORTED_HEADER = 'data:image/png;base64,';
+const saveDataURL = (path: string, dataURL: string) => {
+    if (!dataURL.startsWith(SUPPORTED_HEADER)) {
+        console.log(dataURL);
+        throw new Error('Only base64 image/png is supported');
+    }
+    const base64 = dataURL.slice(SUPPORTED_HEADER.length);
+    return writeFile(path, base64, 'base64');
+};
+
 export default class FFmpeg {
     private ffmpeg: string;
 
@@ -93,10 +108,9 @@ export default class FFmpeg {
             return Promise.resolve(false);
         }
         const length = Math.floor(meta.length);
-        const tmpDir = getRandomTmpDir();
         return new Promise((resolve) => {
             (async () => {
-                await mkdir(tmpDir, { recursive: true });
+                const tmpDir = await getRandomTmpDir();
                 const scale = meta.width >= meta.height ? `${THUMBNAIL.SIZE}:-1` : `-1:${THUMBNAIL.SIZE}`;
                 const outputPath = join(tmpDir, '%04d.png');
                 const thumbnailsCommand = [this.ffmpeg, `-i "${path}"`, `-vf scale=${scale},fps=1`, `"${outputPath}"`].join(' ');
@@ -145,36 +159,59 @@ export default class FFmpeg {
         });
     }
 
+    private async handleSnapshot(
+        path: string,
+        meta: Required<VideoMeta>,
+        tmpDir: string,
+        resolve: (resolve: boolean) => void,
+        options: { seekTime?: number; inputImagePath?: string }
+    ) {
+        const { seekTime, inputImagePath } = options;
+        const scale = meta.width >= meta.height ? `${SNAPSHOT.SIZE}:-1` : `-1:${SNAPSHOT.SIZE}`;
+        const srcPath = join(tmpDir, SNAPSHOT.FILE);
+        const snapshotCommand = [
+            this.ffmpeg,
+            `-i "${inputImagePath ?? path}"`,
+            `-vf scale=${scale}`,
+            seekTime ? `-ss ${formatSeekTime(seekTime)}` : undefined,
+            seekTime ? '-frames:v 1' : undefined,
+            `-qscale ${SNAPSHOT.JPEG_QUALITY}`,
+            `"${srcPath}"`,
+        ]
+            .filter((option) => option)
+            .join(' ');
+        await execPromise(snapshotCommand).catch((error) => {
+            logger.error(error);
+        });
+        const { metaDir } = parsePath(path);
+        await mkdir(metaDir, { recursive: true });
+        const destPath = join(metaDir, SNAPSHOT.FILE);
+        await copyFile(srcPath, destPath).catch((error) => {
+            logger.error(error);
+        });
+        resolve(true);
+    }
+
     public createSnapshot(path: string, meta: Required<VideoMeta>, position?: number): Promise<boolean> {
         if (!meta.height || !meta.width || !meta.length) {
             return Promise.resolve(false);
         }
         const seekTime = position ?? Math.floor(meta.length / 2);
-        const tmpDir = getRandomTmpDir();
         return new Promise((resolve) => {
             (async () => {
-                await mkdir(tmpDir, { recursive: true });
-                const scale = meta.width >= meta.height ? `${SNAPSHOT.SIZE}:-1` : `-1:${SNAPSHOT.SIZE}`;
-                const srcPath = join(tmpDir, SNAPSHOT.FILE);
-                const snapshotCommand = [
-                    this.ffmpeg,
-                    `-i "${path}"`,
-                    `-vf scale=${scale}`,
-                    `-ss ${formatSeekTime(seekTime)}`,
-                    '-frames:v 1',
-                    `-qscale ${SNAPSHOT.JPEG_QUALITY}`,
-                    `"${srcPath}"`,
-                ].join(' ');
-                await execPromise(snapshotCommand).catch((error) => {
-                    logger.error(error);
-                });
-                const { metaDir } = parsePath(path);
-                await mkdir(metaDir, { recursive: true });
-                const destPath = join(metaDir, SNAPSHOT.FILE);
-                await copyFile(srcPath, destPath).catch((error) => {
-                    logger.error(error);
-                });
-                resolve(true);
+                const tmpDir = await getRandomTmpDir();
+                this.handleSnapshot(path, meta, tmpDir, resolve, { seekTime });
+            })();
+        });
+    }
+
+    public updateSnapshot(path: string, meta: Required<VideoMeta>, dataURL: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            (async () => {
+                const tmpDir = await getRandomTmpDir();
+                const inputImagePath = join(tmpDir, SNAPSHOT.TMP_PNG_FILE);
+                await saveDataURL(inputImagePath, dataURL);
+                this.handleSnapshot(path, meta, tmpDir, resolve, { inputImagePath });
             })();
         });
     }

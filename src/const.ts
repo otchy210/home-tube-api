@@ -10,6 +10,7 @@ export const SNAPSHOT = {
     FILE: 'snapshot.jpg',
     SIZE: 720,
     JPEG_QUALITY: 1,
+    TMP_PNG_FILE: 'snapshot.png',
 };
 
 export const POSSIBLE_STARS: Stars[] = [1, 2, 3, 4, 5];
