@@ -7,7 +7,7 @@ export const appConfigHandler: RequestHandler & { get: RequestMethod; post: Requ
         return appConfig;
     },
     post: ({ apiServer, appConfig, body }) => {
-        if (body === undefined) {
+        if (!body) {
             return BAD_REQUEST;
         }
         const updatedAppConfig = { ...appConfig, ...(body as object) };

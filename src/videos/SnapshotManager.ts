@@ -39,6 +39,15 @@ class SnapshotManager extends FFmpegWorker {
     public request(path: string, position: number): void {
         this.enqueue({ path, options: { position: String(position) } });
     }
+
+    public update(path: string, dataURL: string): Promise<boolean> {
+        const metaManager = useMetaManager();
+        const meta = metaManager.getRequiredMeta(path);
+        if (!meta) {
+            return Promise.resolve(false);
+        }
+        return this.ffmpeg.updateSnapshot(path, meta, dataURL);
+    }
 }
 
 let instance: SnapshotManager;

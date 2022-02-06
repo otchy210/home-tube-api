@@ -1,12 +1,12 @@
 import { join } from 'path';
 import { RequestHandler, RequestMethod, StaticFileResponse } from '../types';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
-import { isErrorResponse } from '../utils/ServerResponseUtils';
+import { BAD_REQUEST, isErrorResponse } from '../utils/ServerResponseUtils';
 import { useSnapshotManager } from '../videos/SnapshotManager';
 
 const NO_SNAPSHOT_FILE = join('images', 'no-snapshot.png');
 
-export const snapshotHandler: RequestHandler & { get: RequestMethod } = {
+export const snapshotHandler: RequestHandler & { get: RequestMethod; post: RequestMethod } = {
     path: '/snapshot',
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
@@ -29,5 +29,19 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod } = {
             maxAge: 60 * 10,
         };
         return response;
+    },
+    post: ({ params, body }) => {
+        if (!body) {
+            return BAD_REQUEST;
+        }
+        const video = validateAndGetVideo(params);
+        if (isErrorResponse(video)) {
+            return video;
+        }
+        const snapshotManager = useSnapshotManager();
+        const path = video.path as string;
+        const dataURL = (body as { dataURL: string }).dataURL;
+        snapshotManager.update(path, dataURL);
+        return true;
     },
 };
