@@ -94,7 +94,11 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
                 options.maxAge = handlerResponse.maxAge * 1000;
                 options.immutable = true;
             }
-            send(context.request, handlerResponse.path, options).pipe(response);
+            send(context.request, handlerResponse.path, options)
+                .on('headers', (res) => {
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                })
+                .pipe(response);
         } else {
             response.writeHead(200, buildJsonResponseHeaders(origin));
             response.write(JSON.stringify(handlerResponse));
