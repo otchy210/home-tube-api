@@ -164,13 +164,14 @@ export default class FFmpeg {
         meta: Required<VideoMeta>,
         tmpDir: string,
         resolve: (resolve: boolean) => void,
-        options: { seekTime?: number; inputImagePath?: string }
+        options: { seekTime?: number; inputImagePath?: string; skipNoKeyFrame?: boolean }
     ) {
-        const { seekTime, inputImagePath } = options;
+        const { seekTime, inputImagePath, skipNoKeyFrame } = options;
         const scale = meta.width >= meta.height ? `${SNAPSHOT.SIZE}:-1` : `-1:${SNAPSHOT.SIZE}`;
         const srcPath = join(tmpDir, SNAPSHOT.FILE);
         const snapshotCommand = [
             this.ffmpeg,
+            skipNoKeyFrame ? `-skip_frame nokey` : undefined,
             `-i "${inputImagePath ?? path}"`,
             `-vf scale=${scale}`,
             seekTime ? `-ss ${formatSeekTime(seekTime)}` : undefined,
@@ -200,7 +201,7 @@ export default class FFmpeg {
         return new Promise((resolve) => {
             (async () => {
                 const tmpDir = await getRandomTmpDir();
-                this.handleSnapshot(path, meta, tmpDir, resolve, { seekTime });
+                this.handleSnapshot(path, meta, tmpDir, resolve, { seekTime, skipNoKeyFrame: true });
             })();
         });
     }
