@@ -1,4 +1,4 @@
-import { existsSync, rmdirSync, unlinkSync } from 'fs';
+import { existsSync, rmdirSync, statSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
@@ -19,30 +19,44 @@ describe('FFmpeg', () => {
     const ffmpeg = new FFmpeg();
     describe('getMeta', () => {
         it('works', () => {
-            expect(ffmpeg.getMeta('test/test-movie.mp4')).toStrictEqual({
+            const path1 = 'test/test-movie.mp4';
+            const mtime1 = statSync(path1).mtime.getTime();
+            expect(ffmpeg.getMeta(path1)).toStrictEqual({
                 acodec: 'aac',
                 vcodec: 'h264',
                 duration: '0:03',
+                fileSize: 1504413,
                 height: 1080,
                 length: 3.08,
+                mtime: mtime1,
                 name: 'test-movie.mp4',
                 width: 1920,
             });
-            expect(ffmpeg.getMeta('test/test-movie.avi')).toStrictEqual({
+
+            const path2 = 'test/test-movie.avi';
+            const mtime2 = statSync(path2).mtime.getTime();
+            expect(ffmpeg.getMeta(path2)).toStrictEqual({
                 acodec: 'mp3',
                 vcodec: 'mpeg4',
                 duration: '0:03',
+                fileSize: 1468780,
                 height: 1080,
                 length: 3.1,
+                mtime: mtime2,
                 name: 'test-movie.avi',
                 width: 1920,
             });
-            expect(ffmpeg.getMeta('test/test-movie.wmv')).toStrictEqual({
+
+            const path3 = 'test/test-movie.wmv';
+            const mtime3 = statSync(path3).mtime.getTime();
+            expect(ffmpeg.getMeta(path3)).toStrictEqual({
                 acodec: 'wmav2',
                 vcodec: 'msmpeg4v3',
                 duration: '0:03',
+                fileSize: 1454572,
                 height: 1080,
                 length: 3.14,
+                mtime: mtime3,
                 name: 'test-movie.wmv',
                 width: 1920,
             });

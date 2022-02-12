@@ -30,8 +30,10 @@ describe('detailsHandler', () => {
             expect(detailsHandler.get(mockedContext)).toStrictEqual({
                 acodec: 'aac',
                 duration: '0:03',
+                fileSize: 1504413,
                 height: 1080,
                 length: 3.08,
+                mtime: 1640602283040,
                 name: 'test-movie.mp4',
                 path: 'test/test-movie.mp4',
                 stars: 5,

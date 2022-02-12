@@ -85,6 +85,8 @@ export type VideoMeta = {
     width?: number;
     height?: number;
     acodec?: string;
+    fileSize?: number;
+    mtime?: number;
 };
 
 export type Stars = 1 | 2 | 3 | 4 | 5;
@@ -99,7 +101,7 @@ export type VideoDetails = VideoValues & VideoMeta & VideoProperties;
 export type AllTags = Record<string, number>;
 
 export const isRequiredVideoMeta = (meta: VideoMeta): meta is Required<VideoMeta> => {
-    if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec) {
+    if (meta.name && meta.duration && meta.length && meta.vcodec && meta.width && meta.height && meta.acodec && meta.fileSize && meta.mtime) {
         return true;
     }
     return false;

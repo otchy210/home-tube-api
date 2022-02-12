@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { statSync } from 'fs';
 import { copyFile, mkdir, writeFile } from 'fs/promises';
 import { basename, join } from 'path';
 import { SNAPSHOT, THUMBNAIL } from '../const';
@@ -42,6 +43,16 @@ const parseMetaVideo = (line: string): { vcodec: string; width: number; height: 
 const parseMetaAudio = (line: string): { acodec: string } => {
     const acodec = line.trim().split(' ')[3];
     return { acodec };
+};
+
+const getMetaStats = (path: string) => {
+    const stats = statSync(path);
+    const fileSize = stats.size;
+    const mtime = stats.mtime.getTime();
+    return {
+        fileSize,
+        mtime,
+    };
 };
 
 export const formatSeekTime = (positoin: number): string => {
@@ -98,8 +109,9 @@ export default class FFmpeg {
                 metaAudio = parseMetaAudio(line);
             }
         });
+        const metaStats = getMetaStats(path);
         const name = basename(path);
-        return { name, ...metaDuration, ...metaVideo, ...metaAudio };
+        return { name, ...metaDuration, ...metaVideo, ...metaAudio, ...metaStats };
     }
 
     public createThumbnails(path: string, meta: Required<VideoMeta>): Promise<boolean> {

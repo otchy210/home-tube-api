@@ -1,3 +1,4 @@
+import { statSync } from 'fs';
 import { initializeWorkers, stopWorkers } from './FFMpegWorkersManager';
 import { useMetaManager } from './MetaManager';
 import { useSnapshotManager } from './SnapshotManager';
@@ -16,12 +17,16 @@ describe('FFmpegWorkers', () => {
                 });
             });
             it('reads meta.json properly if exists', (done) => {
-                metaManager.get('test/test-movie.mp4', false).then((meta) => {
+                const path = 'test/test-movie.mp4';
+                const mtime = statSync(path).mtime.getTime();
+                metaManager.get(path, false).then((meta) => {
                     expect(meta).toStrictEqual({
                         acodec: 'aac',
                         duration: '0:03',
+                        fileSize: 1504413,
                         height: 1080,
                         length: 3.08,
+                        mtime: mtime,
                         name: 'test-movie.mp4',
                         vcodec: 'h264',
                         width: 1920,
