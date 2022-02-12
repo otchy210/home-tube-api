@@ -70,7 +70,6 @@ export const getThumbnailsName = (index: number): string => {
 const SUPPORTED_HEADER = 'data:image/png;base64,';
 const saveDataURL = (path: string, dataURL: string) => {
     if (!dataURL.startsWith(SUPPORTED_HEADER)) {
-        console.log(dataURL);
         throw new Error('Only base64 image/png is supported');
     }
     const base64 = dataURL.slice(SUPPORTED_HEADER.length);
