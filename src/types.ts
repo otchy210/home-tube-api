@@ -70,6 +70,7 @@ export type VideoValues = {
     size?: string;
     stars?: Stars;
     tags?: string[];
+    mtime?: number;
 };
 
 export type VideoDocument = {

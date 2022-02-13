@@ -34,6 +34,7 @@ const fields: Field[] = [
     { name: 'size', type: 'tag', indexed: true },
     { name: 'stars', type: 'number', indexed: true },
     { name: 'tags', type: 'tags', indexed: true },
+    { name: 'mtime', type: 'number', indexed: false },
 ];
 
 class VideoCollection {
@@ -84,6 +85,9 @@ class VideoCollection {
                     break;
                 }
             }
+        }
+        if (meta.mtime) {
+            doc.values.mtime = meta.mtime;
         }
         return this.collection.update(doc);
     }
