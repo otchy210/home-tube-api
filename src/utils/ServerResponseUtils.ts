@@ -13,7 +13,7 @@ export const isErrorResponse = (candidate: any): candidate is ErrorResponse => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isStaticFileResponse = (candidate: any): candidate is StaticFileResponse => {
-    return Object.keys(candidate).length === 2 && typeof candidate?.path === 'string' && typeof candidate?.maxAge === 'number';
+    return Object.keys(candidate).length === 1 && typeof candidate?.path === 'string';
 };
 
 export const BAD_REQUEST = {
@@ -39,24 +39,28 @@ export const INTERNAL_SERVER_ERROR = {
 type ResponseHeaders = {
     'Content-Type': string;
     'Access-Control-Allow-Origin'?: string;
+    'Cache-Control'?: string;
 };
 
-const buildResponseHeaders = (contentType: string, origin: string | undefined): ResponseHeaders => {
+const buildResponseHeaders = (contentType: string, origin: string | undefined, maxAge = 0): ResponseHeaders => {
     const responseHeaders = {
         'Content-Type': contentType,
     } as ResponseHeaders;
     if (origin) {
         responseHeaders['Access-Control-Allow-Origin'] = origin;
     }
+    if (maxAge > 0) {
+        responseHeaders['Cache-Control'] = `public, max-age=${maxAge * 1000}, immutable`;
+    }
     return responseHeaders;
 };
 
-export const buildJsonResponseHeaders = (origin: string | undefined): ResponseHeaders => {
-    return buildResponseHeaders('application/json; charset=UTF-8', origin);
+export const buildJsonResponseHeaders = (origin: string | undefined, maxAge = 0): ResponseHeaders => {
+    return buildResponseHeaders('application/json; charset=UTF-8', origin, maxAge);
 };
 
-const buildPlainTextResponseHeaders = (origin: string | undefined): ResponseHeaders => {
-    return buildResponseHeaders('text/plain; charset=UTF-8', origin);
+const buildPlainTextResponseHeaders = (origin: string | undefined, maxAge = 0): ResponseHeaders => {
+    return buildResponseHeaders('text/plain; charset=UTF-8', origin, maxAge);
 };
 
 export const writeErrorResponse = (res: ServerResponse, errorResponse: ErrorResponse, origin: string | undefined): void => {

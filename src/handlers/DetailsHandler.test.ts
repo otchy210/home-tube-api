@@ -12,7 +12,7 @@ describe('detailsHandler', () => {
     describe('get', () => {
         it('returns BAD_REQUEST when validation fails', () => {
             const mockedContext = {} as RequestContext;
-            expect(detailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
+            expect(detailsHandler.get(mockedContext).body).toBe(BAD_REQUEST);
         });
         it('returns whole view of video properly', () => {
             jest.spyOn(sru, 'validateAndGetVideo').mockReturnValue({
@@ -27,7 +27,7 @@ describe('detailsHandler', () => {
                     id: 1,
                 } as RequestParams,
             } as RequestContext;
-            expect(detailsHandler.get(mockedContext)).toStrictEqual({
+            expect(detailsHandler.get(mockedContext).body).toStrictEqual({
                 acodec: 'aac',
                 duration: '0:03',
                 fileSize: 1504413,

@@ -87,7 +87,7 @@ describe('handleRequest', () => {
                 end: jest.fn(),
             } as unknown as ServerResponse;
             const mockedRequestHandler = {
-                get: jest.fn().mockReturnValue({ result: 'ok' }),
+                get: jest.fn().mockReturnValue({ body: { result: 'ok' } }),
             } as unknown as RequestHandler;
             mockedBuildJsonResponseHeaders.mockReturnValue({ dummy: '1' });
 

@@ -8,15 +8,15 @@ export const propertiesHandler: RequestHandler & { post: RequestMethod } = {
     post: ({ params, body }) => {
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         if (body === undefined) {
-            return BAD_REQUEST;
+            return { body: BAD_REQUEST };
         }
         const path = video.path as string;
         const propertiesManager = usePropertiesManager();
         const currentProperties = propertiesManager.get(path);
         const updatedProperties = { ...currentProperties, ...(body as object) };
-        return propertiesManager.update(path, updatedProperties);
+        return { body: propertiesManager.update(path, updatedProperties) };
     },
 };

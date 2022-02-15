@@ -21,6 +21,6 @@ export const serverStatusHandler: RequestHandler & { get: RequestMethod } = {
             thumbnails: thumbnailsManager.getStatus(),
             snapshot: snapshotManager.getStatus(),
         };
-        return status;
+        return { body: status };
     },
 };

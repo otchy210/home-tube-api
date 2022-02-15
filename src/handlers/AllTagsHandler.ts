@@ -5,6 +5,6 @@ export const allTagsHandler: RequestHandler & { get: RequestMethod } = {
     path: '/allTags',
     get: () => {
         const collection = useVideoCollection();
-        return collection.getAllTags();
+        return { body: collection.getAllTags() };
     },
 };

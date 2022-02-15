@@ -1,4 +1,4 @@
-import { RequestContext, RequestParams, VideoDocument } from '../types';
+import { RequestContext, RequestHandlerResponse, RequestParams, VideoDocument } from '../types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { useVideoCollection } from '../videos/VideoCollection';
 import { searchHandler } from './SearchHandler';
@@ -28,12 +28,14 @@ describe('SearchHandler', () => {
 
         it('returns all videos when no params', () => {
             const mockedContext = {} as RequestContext;
-            const searchResults = searchHandler.get(mockedContext) as VideoDocument[];
+            const response = searchHandler.get(mockedContext) as RequestHandlerResponse;
+            const searchResults = response.body as VideoDocument[];
             expect(searchResults.length).toBe(4);
         });
         it('returns all videos when params has no keys', () => {
             const mockedContext = { params: {} } as RequestContext;
-            const searchResults = searchHandler.get(mockedContext) as VideoDocument[];
+            const response = searchHandler.get(mockedContext) as RequestHandlerResponse;
+            const searchResults = response.body as VideoDocument[];
             expect(searchResults.length).toBe(4);
         });
         it('returns BAD_REQUEST when params has invalid param', () => {
@@ -42,7 +44,7 @@ describe('SearchHandler', () => {
                     invalid: 'dummy',
                 } as RequestParams,
             } as RequestContext;
-            expect(searchHandler.get(mockedContext)).toBe(BAD_REQUEST);
+            expect(searchHandler.get(mockedContext).body).toBe(BAD_REQUEST);
         });
         it('returns proper results when params has all valid parameters', () => {
             const mockedContext = {
@@ -52,7 +54,8 @@ describe('SearchHandler', () => {
                     size: 'sd',
                 } as RequestParams,
             } as RequestContext;
-            const searchResults = searchHandler.get(mockedContext) as VideoDocument[];
+            const response = searchHandler.get(mockedContext) as RequestHandlerResponse;
+            const searchResults = response.body as VideoDocument[];
             expect(searchResults.length).toBe(2);
         });
     });

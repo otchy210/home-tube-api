@@ -8,22 +8,21 @@ export const thumbnailsHandler: RequestHandler & { get: RequestMethod } = {
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         const { minute } = params as RequestParams;
         if (typeof minute !== 'number') {
-            return BAD_REQUEST;
+            return { body: BAD_REQUEST };
         }
         const thumbnailsManager = useThumbnailsManager();
         const path = video.path as string;
         const thumbnailsPath = thumbnailsManager.get(path, minute);
         if (!thumbnailsPath) {
-            return NOT_FOUND;
+            return { body: NOT_FOUND };
         }
         const response: StaticFileResponse = {
             path: thumbnailsPath,
-            maxAge: 60 * 60 * 24,
         };
-        return response;
+        return { body: response, maxAge: 60 * 60 * 24 };
     },
 };

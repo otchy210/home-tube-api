@@ -1,4 +1,4 @@
-import { RequestContext, RequestParams, StaticFileResponse } from '../types';
+import { RequestContext, RequestHandlerResponse, RequestParams, StaticFileResponse } from '../types';
 import { snapshotHandler } from './SnapshotHandler';
 import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
 import { useVideoCollection } from '../videos/VideoCollection';
@@ -23,8 +23,9 @@ describe('SnapshotHandler', () => {
                     key: 'key',
                 } as RequestParams,
             } as RequestContext;
-            const result = snapshotHandler.get(mockedContext) as StaticFileResponse;
-            expect(result.maxAge).toBe(60);
+            const response = snapshotHandler.get(mockedContext) as RequestHandlerResponse;
+            const result = response.body as StaticFileResponse;
+            expect(response.maxAge).toBe(60);
             expect(result.path.endsWith('/images/no-snapshot.png')).toBe(true);
         });
         it('returns thumbnails path when thumbnails file found', () => {
@@ -45,7 +46,7 @@ describe('SnapshotHandler', () => {
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;
-            expect(snapshotHandler.get(mockedContext)).toStrictEqual({ maxAge: 600, path: '/dummy/snapshot.jpg' });
+            expect(snapshotHandler.get(mockedContext)).toStrictEqual({ maxAge: 600, body: { path: '/dummy/snapshot.jpg' } });
         });
     });
     afterAll(() => {

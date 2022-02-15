@@ -9,7 +9,7 @@ describe('appConfigHandler', () => {
         const mockedContext = {
             appConfig: TEST_CONFIG,
         } as RequestContext;
-        expect(appConfigHandler.get(mockedContext)).toStrictEqual(TEST_CONFIG);
+        expect(appConfigHandler.get(mockedContext).body).toStrictEqual(TEST_CONFIG);
     });
 
     describe('POST', () => {
@@ -18,7 +18,7 @@ describe('appConfigHandler', () => {
                 fail('appConfigHandler has to implement post');
             }
             const mockedContext = {} as RequestContext;
-            expect(appConfigHandler.post(mockedContext)).toStrictEqual(BAD_REQUEST);
+            expect(appConfigHandler.post(mockedContext).body).toStrictEqual(BAD_REQUEST);
         });
 
         it('stores config properly based on body', () => {

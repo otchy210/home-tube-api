@@ -1,4 +1,4 @@
-import { RequestHandler, RequestMethod, VideoDetails } from '../types';
+import { RequestHandler, RequestMethod } from '../types';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
 import { isErrorResponse } from '../utils/ServerResponseUtils';
 import { useMetaManager } from '../videos/MetaManager';
@@ -9,13 +9,13 @@ export const detailsHandler: RequestHandler & { get: RequestMethod } = {
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         const path = video.path as string;
         const metaManager = useMetaManager();
         const meta = metaManager.getRequiredMeta(path);
         const propertiesManager = usePropertiesManager();
         const properties = propertiesManager.get(path);
-        return { ...video, ...meta, ...properties } as VideoDetails;
+        return { body: { ...video, ...meta, ...properties }, maxAge: 60 };
     },
 };

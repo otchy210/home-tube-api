@@ -11,7 +11,7 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod; post: Reque
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         const snapshotManager = useSnapshotManager();
         const path = video.path as string;
@@ -20,28 +20,26 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod; post: Reque
             const noSnapshotPath = join(process.cwd(), NO_SNAPSHOT_FILE);
             const response: StaticFileResponse = {
                 path: noSnapshotPath,
-                maxAge: 60,
             };
-            return response;
+            return { body: response, maxAge: 60 };
         }
         const response: StaticFileResponse = {
             path: snapshotPath,
-            maxAge: 60 * 10,
         };
-        return response;
+        return { body: response, maxAge: 60 * 10 };
     },
     post: ({ params, body }) => {
         if (!body) {
-            return BAD_REQUEST;
+            return { body: BAD_REQUEST };
         }
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         const snapshotManager = useSnapshotManager();
         const path = video.path as string;
         const dataURL = (body as { dataURL: string }).dataURL;
         snapshotManager.update(path, dataURL);
-        return true;
+        return { body: true };
     },
 };

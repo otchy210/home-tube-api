@@ -22,8 +22,7 @@ describe('videoHandler', () => {
                     key: 'key',
                 } as RequestParams,
             } as RequestContext;
-            expect(videoHandler.get(mockedContext)).toStrictEqual({
-                maxAge: 0,
+            expect(videoHandler.get(mockedContext).body).toStrictEqual({
                 path: '/dummy/dummy.mp4',
             });
         });

@@ -13,14 +13,14 @@ describe('PropertiesHandler', () => {
     describe('post', () => {
         it('returns BAD_REQUEST when no body', () => {
             const mockedContext = {} as RequestContext;
-            expect(propertiesHandler.post(mockedContext)).toBe(BAD_REQUEST);
+            expect(propertiesHandler.post(mockedContext).body).toBe(BAD_REQUEST);
         });
         it('updates only stars property', () => {
             const mockedContext = {
                 body: { stars: 1 } as Json,
             } as RequestContext;
             const origProperties = propertiesManager.get(path);
-            expect(propertiesHandler.post(mockedContext)).toStrictEqual({
+            expect(propertiesHandler.post(mockedContext).body).toStrictEqual({
                 stars: 1,
                 tags: ['tag1', 'tag2', 'tag3'],
             });
@@ -32,7 +32,7 @@ describe('PropertiesHandler', () => {
                 body: { stars: 1, tags: ['tag4', 'tag5'] } as Json,
             } as RequestContext;
             const origProperties = propertiesManager.get(path);
-            expect(propertiesHandler.post(mockedContext)).toStrictEqual({
+            expect(propertiesHandler.post(mockedContext).body).toStrictEqual({
                 stars: 1,
                 tags: ['tag4', 'tag5'],
             });

@@ -35,10 +35,12 @@ export type ErrorResponse = {
 
 export type StaticFileResponse = {
     path: string;
-    maxAge: number;
 };
 
-export type RequestHandlerResponse = Json | ErrorResponse | StaticFileResponse;
+export type RequestHandlerResponse = {
+    maxAge?: number;
+    body: Json | ErrorResponse | StaticFileResponse;
+};
 
 export type RequestMethod = (context: RequestContext) => RequestHandlerResponse;
 

@@ -7,12 +7,11 @@ export const videoHandler: RequestHandler & { get: RequestMethod } = {
     get: ({ params }) => {
         const video = validateAndGetVideo(params);
         if (isErrorResponse(video)) {
-            return video;
+            return { body: video };
         }
         const response: StaticFileResponse = {
             path: video.path as string,
-            maxAge: 0,
         };
-        return response;
+        return { body: response };
     },
 };

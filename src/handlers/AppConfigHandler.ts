@@ -4,13 +4,13 @@ import { RequestHandler, RequestMethod } from '../types';
 export const appConfigHandler: RequestHandler & { get: RequestMethod; post: RequestMethod } = {
     path: '/appConfig',
     get: ({ appConfig }) => {
-        return appConfig;
+        return { body: appConfig };
     },
     post: ({ apiServer, appConfig, body }) => {
         if (!body) {
-            return BAD_REQUEST;
+            return { body: BAD_REQUEST };
         }
         const updatedAppConfig = { ...appConfig, ...(body as object) };
-        return apiServer.saveAppConfig(updatedAppConfig);
+        return { body: apiServer.saveAppConfig(updatedAppConfig) };
     },
 };

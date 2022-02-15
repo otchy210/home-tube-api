@@ -17,7 +17,7 @@ describe('ThumbnailsHandler', () => {
                     minute: 'string',
                 } as RequestParams,
             } as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe(BAD_REQUEST);
+            expect(thumbnailsHandler.get(mockedContext).body).toBe(BAD_REQUEST);
         });
         it('returns NOT_FOUND when no thumbnails file found', () => {
             const videoCollection = useVideoCollection();
@@ -34,7 +34,7 @@ describe('ThumbnailsHandler', () => {
                     minute: 0,
                 } as RequestParams,
             } as RequestContext;
-            expect(thumbnailsHandler.get(mockedContext)).toBe(NOT_FOUND);
+            expect(thumbnailsHandler.get(mockedContext).body).toBe(NOT_FOUND);
         });
         it('returns thumbnails path when thumbnails file found', () => {
             const videoCollection = useVideoCollection();
@@ -56,7 +56,9 @@ describe('ThumbnailsHandler', () => {
             } as RequestContext;
             expect(thumbnailsHandler.get(mockedContext)).toStrictEqual({
                 maxAge: 86400,
-                path: '/dummy/thumbnails_001.jpg',
+                body: {
+                    path: '/dummy/thumbnails_001.jpg',
+                },
             });
         });
     });

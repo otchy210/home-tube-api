@@ -85,24 +85,27 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
         }
         if (handlerResponse === undefined) {
             writeBadRequest(response, origin);
-        } else if (isErrorResponse(handlerResponse)) {
-            writeErrorResponse(response, handlerResponse, origin);
-        } else if (isStaticFileResponse(handlerResponse)) {
-            const options: send.SendOptions = {};
-            if (handlerResponse.maxAge > 0) {
-                options.cacheControl = true;
-                options.maxAge = handlerResponse.maxAge * 1000;
-                options.immutable = true;
-            }
-            send(context.request, handlerResponse.path, options)
-                .on('headers', (res) => {
-                    res.setHeader('Access-Control-Allow-Origin', '*');
-                })
-                .pipe(response);
         } else {
-            response.writeHead(200, buildJsonResponseHeaders(origin));
-            response.write(JSON.stringify(handlerResponse));
-            response.end();
+            const { maxAge, body } = handlerResponse;
+            if (isErrorResponse(body)) {
+                writeErrorResponse(response, body, origin);
+            } else if (isStaticFileResponse(body)) {
+                const options: send.SendOptions = {};
+                if (maxAge && maxAge > 0) {
+                    options.cacheControl = true;
+                    options.maxAge = maxAge * 1000;
+                    options.immutable = true;
+                }
+                send(context.request, body.path, options)
+                    .on('headers', (res) => {
+                        res.setHeader('Access-Control-Allow-Origin', '*');
+                    })
+                    .pipe(response);
+            } else {
+                response.writeHead(200, buildJsonResponseHeaders(origin, maxAge));
+                response.write(JSON.stringify(body));
+                response.end();
+            }
         }
     } catch (e) {
         logger.error(e);
