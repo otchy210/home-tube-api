@@ -16,6 +16,6 @@ export const detailsHandler: RequestHandler & { get: RequestMethod } = {
         const meta = metaManager.getRequiredMeta(path);
         const propertiesManager = usePropertiesManager();
         const properties = propertiesManager.get(path);
-        return { body: { ...video, ...meta, ...properties }, maxAge: 60 };
+        return { body: { ...video, ...meta, ...properties } };
     },
 };
