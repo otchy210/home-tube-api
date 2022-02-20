@@ -207,6 +207,10 @@ export default class ApiServer {
         });
     }
 
+    public getPort(): number {
+        return this.port;
+    }
+
     public getAppConfigPath(): string {
         return this.appConfigPath;
     }
