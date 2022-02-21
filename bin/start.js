@@ -2,8 +2,9 @@
 
 "use strict";
 const { ApiServer } = require('../dist');
+const { DEFAULT_API_PORT } = require('../dist/const');
 
-const port = process.env.HOME_TUBE_API_PORT || 8210;
+const port = process.env.HOME_TUBE_API_PORT || DEFAULT_API_PORT;
 const apiServer = new ApiServer({port});
 apiServer.start().then(() => {
     const appConfigPath = apiServer.getAppConfigPath();

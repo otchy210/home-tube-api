@@ -1,5 +1,7 @@
 import { LengthTag, SizeTag, Stars } from './types';
 
+export const DEFAULT_API_PORT = 8210;
+
 export const THUMBNAIL = {
     SIZE: 240,
     ROW_SIZE: 60,
