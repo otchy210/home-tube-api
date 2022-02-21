@@ -1,9 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
+import { DEFAULT_APP_CONFIG_FILE } from '../const';
 import { AppConfig } from '../types';
-
-export const DEFAULT_APP_CONFIG_FILE = '.home-tube-config.json';
 
 export const getDefaultAppConfigPath = (): string => {
     const home = homedir();
