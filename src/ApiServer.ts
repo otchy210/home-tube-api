@@ -207,6 +207,14 @@ export default class ApiServer {
         });
     }
 
+    public showInitialMessages() {
+        console.log('==== HomeTube API Server =======================================');
+        console.log(`Running on http://localhost:${this.port}`);
+        console.log(`appConfigPath: ${this.appConfigPath}`);
+        console.log('Press Ctrl+C to stop the server');
+        console.log('================================================================');
+    }
+
     public getPort(): number {
         return this.port;
     }
