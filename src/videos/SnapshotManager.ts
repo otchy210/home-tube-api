@@ -18,7 +18,7 @@ class SnapshotManager extends FFmpegWorker {
         }
         const snapshotPath = this.get(path, false);
         if (snapshotPath.length > 0) {
-            return Promise.resolve();
+            return;
         }
         const position = options && options.position ? parseInt(options.position) : undefined;
         await this.ffmpeg.createSnapshot(path, meta, position);

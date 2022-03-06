@@ -94,9 +94,12 @@ export type VideoMeta = {
 
 export type Stars = 1 | 2 | 3 | 4 | 5;
 
+export type VideoConverterStatus = 'unavailable' | 'queued' | 'processing' | 'available';
+
 export type VideoProperties = {
     stars?: Stars | null;
     tags?: string[] | null;
+    mp4?: VideoConverterStatus;
 };
 
 export type VideoDetails = VideoValues & VideoMeta & VideoProperties;
