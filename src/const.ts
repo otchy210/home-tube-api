@@ -17,6 +17,8 @@ export const SNAPSHOT = {
     TMP_PNG_FILE: 'snapshot.png',
 };
 
+export const CONVERTED_MP4 = 'converted.mp4';
+
 export const POSSIBLE_STARS: Stars[] = [1, 2, 3, 4, 5];
 
 export const LENGTH_TAGS: LengthTag[] = [

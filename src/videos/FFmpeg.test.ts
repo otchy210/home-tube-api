@@ -1,5 +1,6 @@
 import { existsSync, rmdirSync, statSync, unlinkSync } from 'fs';
 import { join } from 'path';
+import { CONVERTED_MP4 } from '../const';
 import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpeg, { formatSeekTime } from './FFmpeg';
@@ -120,6 +121,20 @@ describe('FFmpeg', () => {
                     rmdirSync(metaDir);
                     done();
                 });
+        });
+    });
+
+    describe('convertToMp4', () => {
+        it('works', (done) => {
+            const path = 'test/test-movie.wmv';
+            ffmpeg.convertToMp4(path).then(() => {
+                const { metaDir } = parsePath(path);
+                const mp4Path = join(metaDir, CONVERTED_MP4);
+                expect(existsSync(mp4Path)).toBe(true);
+                unlinkSync(mp4Path);
+                rmdirSync(metaDir);
+                done();
+            });
         });
     });
 });

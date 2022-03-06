@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import { statSync } from 'fs';
 import { copyFile, mkdir, writeFile } from 'fs/promises';
 import { basename, join } from 'path';
-import { SNAPSHOT, THUMBNAIL } from '../const';
+import { CONVERTED_MP4, SNAPSHOT, THUMBNAIL } from '../const';
 import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
 import logger from '../utils/logger';
@@ -224,6 +224,26 @@ export default class FFmpeg {
                 const inputImagePath = join(tmpDir, SNAPSHOT.TMP_PNG_FILE);
                 await saveDataURL(inputImagePath, dataURL);
                 this.handleSnapshot(path, meta, tmpDir, resolve, { inputImagePath });
+            })();
+        });
+    }
+
+    public convertToMp4(path: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            (async () => {
+                const tmpDir = await getRandomTmpDir();
+                const outputPath = join(tmpDir, CONVERTED_MP4);
+                const convertCommand = [this.ffmpeg, `-i "${path}"`, '-vf bwdif=0:-1:1', '-c:v libx264', '-pix_fmt yuv420p', `"${outputPath}"`].join(' ');
+                await execPromise(convertCommand).catch((error) => {
+                    logger.error(error);
+                });
+                const { metaDir } = parsePath(path);
+                await mkdir(metaDir, { recursive: true });
+                const destPath = join(metaDir, CONVERTED_MP4);
+                await copyFile(outputPath, destPath).catch((error) => {
+                    logger.error(error);
+                });
+                resolve(true);
             })();
         });
     }
