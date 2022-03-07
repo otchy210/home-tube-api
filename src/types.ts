@@ -133,6 +133,7 @@ export type ServerStatus = {
     meta: FFmpegWoekerStatus;
     thumbnails: FFmpegWoekerStatus;
     snapshot: FFmpegWoekerStatus;
+    mp4: FFmpegWoekerStatus;
 };
 
 export type LengthTag = {

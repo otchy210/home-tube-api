@@ -26,6 +26,7 @@ import { snapshotHandler } from './handlers/SnapshotHandler';
 import { videoHandler } from './handlers/VideoHandler';
 import { allTagsHandler } from './handlers/AllTagsHandler';
 import { serverStatusHandler } from './handlers/ServerStatusHandler';
+import { convertHandler } from './handlers/ConvertHandler';
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
 
@@ -169,6 +170,7 @@ const defaultRequestHandlers: RequestHandler[] = [
     detailsHandler,
     snapshotHandler,
     propertiesHandler,
+    convertHandler,
     videoHandler,
     thumbnailsHandler,
     allTagsHandler,
