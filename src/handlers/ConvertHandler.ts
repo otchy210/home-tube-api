@@ -17,7 +17,7 @@ export const convertHandler: RequestHandler & { post: RequestMethod } = {
         }
         const path = video.path as string;
         const mp4Manager = useMp4Manager();
-        mp4Manager.enqueue({ path });
-        return { body: true };
+        const status = mp4Manager.enqueue({ path });
+        return { body: { status } };
     },
 };

@@ -7,20 +7,20 @@ class Mp4Manager extends FFmpegWorker {
         super(ffmpeg);
     }
 
-    public enqueue(request: FFmpegRequest): void {
+    public enqueue(request: FFmpegRequest): string {
         const { path } = request;
         const propertiesManager = usePropertiesManager();
         const properties = propertiesManager.get(path);
         switch (properties.mp4) {
             case 'available':
-                return;
+                return 'available';
         }
         const queuedProperties: VideoProperties = {
             ...properties,
             mp4: 'queued',
         };
         propertiesManager.update(path, queuedProperties);
-        super.enqueue(request);
+        return super.enqueue(request);
     }
 
     async consume({ path }: ConsumeParams): Promise<void> {

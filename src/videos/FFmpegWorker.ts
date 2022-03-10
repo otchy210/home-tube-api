@@ -28,8 +28,9 @@ export default abstract class FFmpegWorker {
         this.check();
     }
 
-    public enqueue(request: FFmpegRequest): void {
+    public enqueue(request: FFmpegRequest): string {
         this.queue.push(request);
+        return 'queued';
     }
 
     public getQueue(): FFmpegRequest[] {
