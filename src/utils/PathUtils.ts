@@ -1,7 +1,6 @@
 import { basename, dirname, join } from 'path';
+import { META_DIR } from '../const';
 import { md5 } from './StringUtils';
-
-const META_DIR = '.home-tube';
 
 type ParsedPath = {
     name: string;

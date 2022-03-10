@@ -1,5 +1,6 @@
 import { readdir } from 'fs/promises';
 import { join } from 'path';
+import { META_DIR } from '../const';
 import { StorageMonitorStatus } from '../types';
 
 // https://en.wikipedia.org/wiki/Video_file_format
@@ -17,7 +18,9 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
             for (const dirent of dirents) {
                 const currentPath = join(path, dirent.name);
                 if (dirent.isDirectory()) {
-                    promises.push(readDir(currentPath, set));
+                    if (dirent.name !== META_DIR) {
+                        promises.push(readDir(currentPath, set));
+                    }
                 } else if (dirent.isFile()) {
                     const extension = getExtension(dirent.name);
                     if (MOVIE_EXTENSIONS.has(extension)) {

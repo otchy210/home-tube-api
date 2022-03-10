@@ -4,6 +4,8 @@ export const DEFAULT_API_PORT = 8210;
 
 export const DEFAULT_APP_CONFIG_FILE = '.home-tube-config.json';
 
+export const META_DIR = '.home-tube';
+
 export const THUMBNAIL = {
     SIZE: 240,
     ROW_SIZE: 60,
