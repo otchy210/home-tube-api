@@ -66,11 +66,11 @@ describe('StorageMonitor', () => {
                 new Set([`${tmp}/storage1/a/b/a/test-movie.mp4`, `${tmp}/storage1/a/b/a/test-movie2.mp4`])
             );
             listener.mockReset();
-        }, 500);
+        }, 700);
         setTimeout(() => {
             worker.stop();
             done();
-        }, 600);
+        }, 800);
     });
 
     afterAll(() => {
