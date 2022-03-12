@@ -4,6 +4,7 @@ import { join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
+import { useMp4Manager } from './Mp4Manager';
 import { usePropertiesManager } from './PropertiesManager';
 import { useSnapshotManager } from './SnapshotManager';
 import { useThumbnailsManager } from './ThumbnailsManager';
@@ -17,11 +18,23 @@ const getMetaPath = (metaDir: string): string => {
 
 const enqueuSubTasksAsNeeded = (path: string): void => {
     // index properties
-    usePropertiesManager().get(path);
+    const propertiesManager = usePropertiesManager();
+    const properties = propertiesManager.get(path);
     // generate thumbnails
     useThumbnailsManager().get(path, 0);
     // generage snapshot
     useSnapshotManager().get(path);
+    // convert mp4
+    switch (properties.mp4) {
+        case 'processing':
+            useMp4Manager().enqueue({ path });
+            properties.mp4 = 'queued';
+            propertiesManager.update(path, properties);
+            break;
+        case 'queued':
+            useMp4Manager().enqueue({ path });
+            break;
+    }
 };
 
 class MetaManager extends FFmpegWorker {
