@@ -1,4 +1,4 @@
-import { mkdir } from '../utils/fsPromises';
+import { mkdir } from 'fs/promises';
 import { FFmpegWoekerStatus } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpeg from './FFmpeg';

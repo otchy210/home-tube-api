@@ -1,4 +1,4 @@
-import { readdir } from '../utils/fsPromises';
+import { readdir } from 'fs/promises';
 import { join } from 'path';
 import { META_DIR } from '../const';
 import { StorageMonitorStatus } from '../types';

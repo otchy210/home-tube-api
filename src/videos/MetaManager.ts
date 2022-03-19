@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
-import { readFile, writeFile } from '../utils/fsPromises';
+import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
