@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import { statSync } from 'fs';
-import { copyFile, mkdir, writeFile } from 'fs/promises';
+import { copyFile, mkdir, writeFile } from '../utils/fsPromises';
 import { basename, join } from 'path';
 import { CONVERTED_MP4, SNAPSHOT, THUMBNAIL } from '../const';
 import { VideoMeta } from '../types';
