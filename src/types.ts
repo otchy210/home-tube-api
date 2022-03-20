@@ -1,6 +1,11 @@
 import { IncomingMessage } from 'http';
 import ApiServer from './ApiServer';
 
+export type ApiServerConfig = {
+    port?: number;
+    appConfig?: string;
+};
+
 export type Storage = {
     path: string;
     enabled: boolean;

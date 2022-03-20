@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
-import { AppConfig, RequestHandler, RequestContext, Storage } from './types';
+import { AppConfig, RequestHandler, RequestContext, Storage, ApiServerConfig } from './types';
 import { useStorageManager } from './videos/StorageManager';
 import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
@@ -16,11 +16,11 @@ export default class ApiServer {
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
 
-    public constructor(requestHandlers: RequestHandler[] = defaultRequestHandlers) {
-        const argv = parseArgv();
+    public constructor(apiServerConfig?: ApiServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
+        const config = apiServerConfig ?? parseArgv();
 
-        this.port = argv.port ?? DEFAULT_API_PORT;
-        this.appConfigPath = argv.appConfig ?? getDefaultAppConfigPath();
+        this.port = config.port ?? DEFAULT_API_PORT;
+        this.appConfigPath = config.appConfig ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
         initializeWorkers(this.appConfig.ffmpeg);
         this.updateStorages([], this.appConfig.storages);

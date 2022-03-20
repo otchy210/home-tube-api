@@ -1,5 +1,5 @@
 import { ServerResponse } from 'http';
-import { Json, RequestContext, RequestHandler, RequestHandlerResponse, RequestParams } from '../types';
+import { ApiServerConfig, Json, RequestContext, RequestHandler, RequestHandlerResponse, RequestParams } from '../types';
 import {
     buildJsonResponseHeaders,
     isErrorResponse,
@@ -16,12 +16,7 @@ import * as yargs from 'yargs';
 import { getDefaultAppConfigPath } from './AppConfigUtils';
 import { DEFAULT_API_PORT } from '../const';
 
-export type Argv = {
-    port?: number;
-    appConfig?: string;
-};
-
-export const parseArgv = (): Argv => {
+export const parseArgv = (): ApiServerConfig => {
     const defaultAppConfig = getDefaultAppConfigPath();
     return yargs
         .option('port', {
@@ -32,7 +27,7 @@ export const parseArgv = (): Argv => {
             type: 'string',
             description: `HomeTube config file path [default: ${defaultAppConfig}]`,
         })
-        .help().argv as Argv;
+        .help().argv as ApiServerConfig;
 };
 
 const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
