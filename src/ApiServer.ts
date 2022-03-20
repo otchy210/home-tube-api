@@ -1,181 +1,13 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
-import {
-    buildJsonResponseHeaders,
-    isErrorResponse,
-    isStaticFileResponse,
-    writeBadRequest,
-    writeErrorResponse,
-    writeInternalServerError,
-    writeMethodNotAllowed,
-    writeNotFound,
-} from './utils/ServerResponseUtils';
-import { AppConfig, Json, RequestHandler, RequestContext, ServerConfig, RequestParams, Storage, RequestHandlerResponse } from './types';
-import { appConfigHandler } from './handlers/AppConfigHandler';
-import { searchHandler } from './handlers/SearchHandler';
+import { AppConfig, RequestHandler, RequestContext, Storage } from './types';
 import { useStorageManager } from './videos/StorageManager';
-import logger from './utils/logger';
 import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
-import { thumbnailsHandler } from './handlers/ThumbnailsHandler';
 import { useVideoCollection } from './videos/VideoCollection';
-import { detailsHandler } from './handlers/DetailsHandler';
-import { propertiesHandler } from './handlers/PropertiesHandler';
-import send = require('send');
-import { snapshotHandler } from './handlers/SnapshotHandler';
-import { videoHandler } from './handlers/VideoHandler';
-import { allTagsHandler } from './handlers/AllTagsHandler';
-import { serverStatusHandler } from './handlers/ServerStatusHandler';
-import { convertHandler } from './handlers/ConvertHandler';
-
-const supportedMethods = ['GET', 'POST', 'DELETE', 'OPTIONS'];
-
-export const parseUrl = (url: string): { urlPath: string; params?: RequestParams } => {
-    const charIndex = url.indexOf('?');
-    if (charIndex < 0) {
-        return { urlPath: url };
-    }
-    const urlPath = url.substring(0, charIndex);
-    const params = url
-        .substring(charIndex + 1)
-        .split('&')
-        .map((pairStr) => pairStr.split('='))
-        .reduce<RequestParams>((map, [key, value]) => {
-            const decodedValue = decodeURIComponent(value);
-            if (map[key] !== undefined) {
-                console.warn(`Duplicate param name is not allowed: "${key}" has "${map[key]}" already / skipped "${decodedValue}"`);
-                return map;
-            }
-            try {
-                map[key] = JSON.parse(decodedValue);
-            } catch {
-                // treat all parse errors as string value
-                map[key] = decodedValue;
-            }
-            return map;
-        }, {});
-    return { urlPath, params };
-};
-
-export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler) => {
-    let handlerResponse: RequestHandlerResponse | undefined;
-    const origin = context.request?.headers?.origin;
-    try {
-        switch (context.request.method) {
-            case 'GET':
-                if (handler?.get === undefined) {
-                    writeMethodNotAllowed(response, origin);
-                    return;
-                }
-                handlerResponse = handler.get(context);
-                break;
-            case 'POST':
-                if (handler?.post === undefined) {
-                    writeMethodNotAllowed(response, origin);
-                    return;
-                }
-                handlerResponse = handler.post(context);
-                break;
-            case 'DELETE':
-                if (handler?.delete === undefined) {
-                    writeMethodNotAllowed(response, origin);
-                    return;
-                }
-                handlerResponse = handler.delete(context);
-                break;
-        }
-        if (handlerResponse === undefined) {
-            writeBadRequest(response, origin);
-        } else {
-            const { maxAge, body } = handlerResponse;
-            if (isErrorResponse(body)) {
-                writeErrorResponse(response, body, origin);
-            } else if (isStaticFileResponse(body)) {
-                const options: send.SendOptions = {};
-                if (maxAge && maxAge > 0) {
-                    options.cacheControl = true;
-                    options.maxAge = maxAge * 1000;
-                    options.immutable = true;
-                }
-                send(context.request, body.path, options)
-                    .on('headers', (res) => {
-                        res.setHeader('Access-Control-Allow-Origin', '*');
-                    })
-                    .pipe(response);
-            } else {
-                response.writeHead(200, buildJsonResponseHeaders(origin, maxAge));
-                response.write(JSON.stringify(body));
-                response.end();
-            }
-        }
-    } catch (e) {
-        logger.error(e);
-        writeInternalServerError(response, origin);
-    }
-};
-
-export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
-    const { method, url } = context.request;
-    const origin = context.request?.headers?.origin;
-    if (method === undefined) {
-        writeBadRequest(response, origin);
-        return;
-    }
-    if (!supportedMethods.includes(method)) {
-        writeMethodNotAllowed(response, origin);
-        return;
-    }
-    if (method === 'OPTIONS') {
-        const responseHeaders = {
-            'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Methods': supportedMethods.join(', '),
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': 7200,
-        };
-        response.writeHead(204, responseHeaders);
-        response.end();
-        return;
-    }
-    if (url === undefined) {
-        writeNotFound(response, origin);
-        return;
-    }
-
-    const urlParams = parseUrl(url);
-    const handler = requestHandlers.get(urlParams.urlPath);
-    if (!handler) {
-        writeNotFound(response, origin);
-        return;
-    }
-    if (urlParams.params) {
-        context.params = urlParams.params;
-    }
-
-    const bodyChunks = new Array<Uint8Array>();
-    context.request.on('data', (chunk) => {
-        bodyChunks.push(chunk);
-    });
-    context.request.on('end', () => {
-        if (bodyChunks.length > 0) {
-            const bodyBuffer = Buffer.concat(bodyChunks);
-            context.body = JSON.parse(bodyBuffer.toString()) as Json;
-        }
-        handleRequestEnd(context, response, handler);
-    });
-};
-
-const defaultRequestHandlers: RequestHandler[] = [
-    appConfigHandler,
-    searchHandler,
-    detailsHandler,
-    snapshotHandler,
-    propertiesHandler,
-    convertHandler,
-    videoHandler,
-    thumbnailsHandler,
-    allTagsHandler,
-    serverStatusHandler,
-];
+import { handleRequest, parseArgv } from './utils/ApiServerUtils';
+import { defaultRequestHandlers } from './handlers/defaultRequestHandlers';
+import { DEFAULT_API_PORT } from './const';
 
 export default class ApiServer {
     private port: number;
@@ -184,9 +16,11 @@ export default class ApiServer {
     private httpServer: HttpServer;
     private requestHandlers = new Map<string, RequestHandler>();
 
-    public constructor(serverConfig: ServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
-        this.port = serverConfig.port;
-        this.appConfigPath = serverConfig.appConfigPath ?? getDefaultAppConfigPath();
+    public constructor(requestHandlers: RequestHandler[] = defaultRequestHandlers) {
+        const argv = parseArgv();
+
+        this.port = argv.port ?? DEFAULT_API_PORT;
+        this.appConfigPath = argv.appConfig ?? getDefaultAppConfigPath();
         this.appConfig = loadAppConfig(this.appConfigPath);
         initializeWorkers(this.appConfig.ffmpeg);
         this.updateStorages([], this.appConfig.storages);

@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+"use strict";
+
+const { ApiServer } = require("../dist");
+
+const apiServer = new ApiServer();
+apiServer.start().then(() => {
+    apiServer.showInitialMessages();
+});
