@@ -46,7 +46,7 @@ export default class ApiServer {
 
     public showInitialMessages() {
         console.log('==== HomeTube API Server =======================================');
-        console.log('Running on:');
+        console.log('ApiServer running on:');
         getLocalIpv4Addresses().forEach((ipv4) => {
             const host = ipv4 === '127.0.0.1' ? 'localhost' : ipv4;
             console.log(`    http://${host}:${this.port}`);
