@@ -8,6 +8,7 @@ import { useVideoCollection } from './videos/VideoCollection';
 import { handleRequest, parseArgv } from './utils/ApiServerUtils';
 import { defaultRequestHandlers } from './handlers/defaultRequestHandlers';
 import { DEFAULT_API_PORT } from './const';
+import { getLocalIpv4Addresses } from './utils/NetworkUtils';
 
 export default class ApiServer {
     private port: number;
@@ -45,7 +46,11 @@ export default class ApiServer {
 
     public showInitialMessages() {
         console.log('==== HomeTube API Server =======================================');
-        console.log(`Running on http://localhost:${this.port}`);
+        console.log('Running on:');
+        getLocalIpv4Addresses().forEach((ipv4) => {
+            const host = ipv4 === '127.0.0.1' ? 'localhost' : ipv4;
+            console.log(`    http://${host}:${this.port}`);
+        });
         console.log(`appConfigPath: ${this.appConfigPath}`);
         console.log('Press Ctrl+C to stop the server');
         console.log('================================================================');
