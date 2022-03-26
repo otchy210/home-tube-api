@@ -10,7 +10,8 @@ type ParsedPath = {
 };
 
 export const parsePath = (path: string): ParsedPath => {
-    const name = basename(path);
+    const normalizedPath = path.normalize();
+    const name = basename(normalizedPath);
     const hashedName = md5(name);
     const dir = dirname(path);
     const metaDir = join(dir, META_DIR, hashedName);
