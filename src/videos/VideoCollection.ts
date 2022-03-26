@@ -51,9 +51,10 @@ class VideoCollection {
         return this.collection.getAll();
     }
     public add(path: string): void {
-        const key = sha256(path);
-        const name = basename(path);
-        const names = getNames(path);
+        const normalizedPath = path.normalize();
+        const key = sha256(normalizedPath);
+        const name = basename(normalizedPath);
+        const names = getNames(normalizedPath);
         this.collection.add({
             values: { key, path, name, names },
         });
