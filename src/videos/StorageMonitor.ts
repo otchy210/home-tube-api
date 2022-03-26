@@ -35,7 +35,7 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
     });
 };
 
-export type StorageListener = (added: Set<string>, removed: Set<string>) => void;
+export type StorageListener = (added: Set<string>, removed: Set<string>) => Promise<void>;
 
 export default class StorageMonitor {
     private path: string;
@@ -96,6 +96,12 @@ export default class StorageMonitor {
         }
         this.listener(new Set(), this.current);
         this.status = 'stopped';
+    }
+
+    public rename(srcPath: string, destPath: string): Promise<void> {
+        const added = new Set<string>([destPath]);
+        const removed = new Set<string>([srcPath]);
+        return this.listener(added, removed);
     }
 
     public getStatus() {

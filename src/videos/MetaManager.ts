@@ -1,6 +1,6 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { readFile, writeFile } from '../utils/fsPromises';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
@@ -96,6 +96,21 @@ class MetaManager extends FFmpegWorker {
             return;
         }
         return meta;
+    }
+
+    /**
+     * Assuming the new video has different name from the original and update name field in meta data.
+     * @param path new video path
+     */
+    public rename(path: string) {
+        const meta = this.getRequiredMeta(path);
+        if (!meta) {
+            return;
+        }
+        const { metaDir } = parsePath(path);
+        const metaPath = getMetaPath(metaDir);
+        meta.name = basename(path);
+        writeFileSync(metaPath, JSON.stringify(meta));
     }
 }
 

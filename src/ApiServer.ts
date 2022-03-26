@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
-import { AppConfig, RequestHandler, RequestContext, Storage, ApiServerConfig } from './types';
+import { AppConfig, RequestHandler, RequestContext, Storage, ApiServerConfig, VideoMeta } from './types';
 import { useStorageManager } from './videos/StorageManager';
 import { initializeWorkers, reinstantiateWorkers, stopWorkers } from './videos/FFmpegWorkersManager';
 import { useMetaManager } from './videos/MetaManager';
@@ -87,18 +87,20 @@ export default class ApiServer {
         });
     }
 
-    private createStorageListener(): (added: Set<string>, removed: Set<string>) => void {
+    private createStorageListener(): (added: Set<string>, removed: Set<string>) => Promise<void> {
         const metaManager = useMetaManager();
         const videoCollection = useVideoCollection();
         return (added, removed) => {
+            const promises: Promise<VideoMeta>[] = [];
             removed.forEach((path) => {
                 videoCollection.remove(path);
             });
             added.forEach((path) => {
                 videoCollection.add(path);
                 // try updating meta
-                metaManager.get(path);
+                promises.push(metaManager.get(path));
             });
+            return Promise.all(promises) as unknown as Promise<void>;
         };
     }
 

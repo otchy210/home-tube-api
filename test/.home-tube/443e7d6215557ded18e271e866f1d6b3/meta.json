@@ -1,11 +1,1 @@
-{
-    "duration": "0:03",
-    "length": 3.08,
-    "vcodec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "acodec": "aac",
-    "name": "test-movie.mp4",
-    "fileSize": 1504413,
-    "mtime": 1640602283040
-}
+{"duration":"0:03","length":3.08,"vcodec":"h264","width":1920,"height":1080,"acodec":"aac","name":"test-movie.mp4","fileSize":1504413,"mtime":1640602283040}
