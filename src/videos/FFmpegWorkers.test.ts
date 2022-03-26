@@ -10,13 +10,13 @@ describe('FFmpegWorkers', () => {
         const metaManager = useMetaManager();
         describe('get', () => {
             it('returns only name if there is no meta.json', (done) => {
-                metaManager.get('test/test-movie.wmv', false).then((meta) => {
+                metaManager.get('test/storage1/test-movie.wmv', false).then((meta) => {
                     expect(meta).toStrictEqual({ name: 'test-movie.wmv' });
                     done();
                 });
             });
             it('reads meta.json properly if exists', (done) => {
-                const path = 'test/test-movie.mp4';
+                const path = 'test/storage1/test-movie.mp4';
                 metaManager.get(path, false).then((meta) => {
                     expect(meta).toStrictEqual({
                         acodec: 'aac',
@@ -40,10 +40,12 @@ describe('FFmpegWorkers', () => {
 
         describe('get', () => {
             it('returns empty string if there is no thumbnails file', () => {
-                expect(thumbnailsManager.get('test/test-movie.mp4', 1, false)).toBe('');
+                expect(thumbnailsManager.get('test/storage1/test-movie.mp4', 1, false)).toBe('');
             });
             it('returns thumbranils file path if it exists', () => {
-                expect(thumbnailsManager.get('test/test-movie.mp4', 0, false)).toBe('test/.home-tube/443e7d6215557ded18e271e866f1d6b3/thumbnails_000.jpg');
+                expect(thumbnailsManager.get('test/storage1/test-movie.mp4', 0, false)).toBe(
+                    'test/storage1/.home-tube/443e7d6215557ded18e271e866f1d6b3/thumbnails_000.jpg'
+                );
             });
         });
     });
@@ -53,10 +55,12 @@ describe('FFmpegWorkers', () => {
 
         describe('get', () => {
             it('returns empty string if there is no thumbnails file', () => {
-                expect(snapshotManager.get('test/test-movie.wmv', false)).toBe('');
+                expect(snapshotManager.get('test/storage1/test-movie.wmv', false)).toBe('');
             });
             it('returns thumbranils file path if it exists', () => {
-                expect(snapshotManager.get('test/test-movie.mp4', false)).toBe('test/.home-tube/443e7d6215557ded18e271e866f1d6b3/snapshot.jpg');
+                expect(snapshotManager.get('test/storage1/test-movie.mp4', false)).toBe(
+                    'test/storage1/.home-tube/443e7d6215557ded18e271e866f1d6b3/snapshot.jpg'
+                );
             });
         });
     });

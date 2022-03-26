@@ -16,7 +16,7 @@ describe('detailsHandler', () => {
         });
         it('returns whole view of video properly', () => {
             jest.spyOn(sru, 'validateAndGetVideo').mockReturnValue({
-                path: 'test/test-movie.mp4',
+                path: 'test/storage1/test-movie.mp4',
             });
             const propertiesManager = usePropertiesManager();
             jest.spyOn(propertiesManager, 'get').mockReturnValue({
@@ -35,7 +35,7 @@ describe('detailsHandler', () => {
                 length: 3.08,
                 mtime: 1640602283040,
                 name: 'test-movie.mp4',
-                path: 'test/test-movie.mp4',
+                path: 'test/storage1/test-movie.mp4',
                 stars: 5,
                 vcodec: 'h264',
                 width: 1920,

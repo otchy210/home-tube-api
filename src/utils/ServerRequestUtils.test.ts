@@ -27,7 +27,7 @@ describe('validateAndGetVideo', () => {
             minute: 0,
         } as RequestParams;
         const videoCollection = useVideoCollection();
-        jest.spyOn(videoCollection, 'get').mockReturnValue({ id: 1, values: { path: 'test/test-movie.mp4' } });
-        expect(validateAndGetVideo(mockedParams)).toEqual({ path: 'test/test-movie.mp4' });
+        jest.spyOn(videoCollection, 'get').mockReturnValue({ id: 1, values: { path: 'test/storage1/test-movie.mp4' } });
+        expect(validateAndGetVideo(mockedParams)).toEqual({ path: 'test/storage1/test-movie.mp4' });
     });
 });

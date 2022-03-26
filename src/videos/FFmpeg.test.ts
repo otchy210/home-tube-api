@@ -20,7 +20,7 @@ describe('FFmpeg', () => {
     const ffmpeg = new FFmpeg();
     describe('getMeta', () => {
         it('works', () => {
-            const path1 = 'test/test-movie.mp4';
+            const path1 = 'test/storage1/test-movie.mp4';
             const mtime1 = statSync(path1).mtime.getTime();
             expect(ffmpeg.getMeta(path1)).toStrictEqual({
                 acodec: 'aac',
@@ -34,7 +34,7 @@ describe('FFmpeg', () => {
                 width: 1920,
             });
 
-            const path2 = 'test/test-movie.avi';
+            const path2 = 'test/storage1/test-movie.avi';
             const mtime2 = statSync(path2).mtime.getTime();
             expect(ffmpeg.getMeta(path2)).toStrictEqual({
                 acodec: 'mp3',
@@ -48,7 +48,7 @@ describe('FFmpeg', () => {
                 width: 1920,
             });
 
-            const path3 = 'test/test-movie.wmv';
+            const path3 = 'test/storage1/test-movie.wmv';
             const mtime3 = statSync(path3).mtime.getTime();
             expect(ffmpeg.getMeta(path3)).toStrictEqual({
                 acodec: 'wmav2',
@@ -66,7 +66,7 @@ describe('FFmpeg', () => {
 
     describe('createThumbnails', () => {
         it('works', (done) => {
-            const path = 'test/test-movie.wmv';
+            const path = 'test/storage1/test-movie.wmv';
             const meta = ffmpeg.getMeta(path);
             if (!isRequiredVideoMeta(meta)) {
                 throw new Error();
@@ -84,7 +84,7 @@ describe('FFmpeg', () => {
 
     describe('createSnapshot', () => {
         it('works', (done) => {
-            const path = 'test/test-movie.wmv';
+            const path = 'test/storage1/test-movie.wmv';
             const meta = ffmpeg.getMeta(path);
             if (!isRequiredVideoMeta(meta)) {
                 throw new Error();
@@ -102,7 +102,7 @@ describe('FFmpeg', () => {
 
     describe('updateSnapshot', () => {
         it('works', (done) => {
-            const path = 'test/test-movie.wmv';
+            const path = 'test/storage1/test-movie.wmv';
             const meta = ffmpeg.getMeta(path);
             if (!isRequiredVideoMeta(meta)) {
                 throw new Error();
@@ -126,7 +126,7 @@ describe('FFmpeg', () => {
 
     describe('convertToMp4', () => {
         it('works', (done) => {
-            const path = 'test/test-movie.wmv';
+            const path = 'test/storage1/test-movie.wmv';
             ffmpeg.convertToMp4(path).then(() => {
                 const { metaDir } = parsePath(path);
                 const mp4Path = join(metaDir, CONVERTED_MP4);

@@ -5,7 +5,7 @@ import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 
 describe('PropertiesHandler', () => {
-    const path = 'test/test-movie.mp4';
+    const path = 'test/storage1/test-movie.mp4';
     jest.spyOn(sru, 'validateAndGetVideo').mockReturnValue({
         path,
     });
