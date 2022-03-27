@@ -1,14 +1,15 @@
 import { RequestHandler } from '../types';
-import { appConfigHandler } from '../handlers/AppConfigHandler';
-import { searchHandler } from '../handlers/SearchHandler';
-import { thumbnailsHandler } from '../handlers/ThumbnailsHandler';
-import { detailsHandler } from '../handlers/DetailsHandler';
-import { propertiesHandler } from '../handlers/PropertiesHandler';
-import { snapshotHandler } from '../handlers/SnapshotHandler';
-import { videoHandler } from '../handlers/VideoHandler';
-import { allTagsHandler } from '../handlers/AllTagsHandler';
-import { serverStatusHandler } from '../handlers/ServerStatusHandler';
-import { convertHandler } from '../handlers/ConvertHandler';
+import { appConfigHandler } from './AppConfigHandler';
+import { searchHandler } from './SearchHandler';
+import { thumbnailsHandler } from './ThumbnailsHandler';
+import { detailsHandler } from './DetailsHandler';
+import { propertiesHandler } from './PropertiesHandler';
+import { snapshotHandler } from './SnapshotHandler';
+import { videoHandler } from './VideoHandler';
+import { allTagsHandler } from './AllTagsHandler';
+import { serverStatusHandler } from './ServerStatusHandler';
+import { convertHandler } from './ConvertHandler';
+import { renameHandler } from './RenameHandler';
 
 export const defaultRequestHandlers: RequestHandler[] = [
     appConfigHandler,
@@ -21,4 +22,5 @@ export const defaultRequestHandlers: RequestHandler[] = [
     thumbnailsHandler,
     allTagsHandler,
     serverStatusHandler,
+    renameHandler,
 ];

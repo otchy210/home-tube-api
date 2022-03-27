@@ -85,7 +85,6 @@ class StorageManager {
 
         // rename meta dir
         if (existsSync(srcMetaDir)) {
-            console.log({ action: 'rename', from: srcMetaDir, to: destMetaDir });
             if (!existsSync(destMetaDir)) {
                 mkdirSync(destMetaDir);
             }
@@ -100,7 +99,6 @@ class StorageManager {
                 }
             });
             rmdirSync(srcMetaDir, { recursive: true });
-            console.log(`Removed: ${srcMetaDir}`);
         }
 
         // update name in meta data
