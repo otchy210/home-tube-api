@@ -43,7 +43,8 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
         .split('&')
         .map((pairStr) => pairStr.split('='))
         .reduce<RequestParams>((map, [key, value]) => {
-            const decodedValue = decodeURIComponent(value);
+            const decodedValue = decodeURIComponent(value.replace(/\+/g, ' '));
+            console.log({ decodedValue });
             if (map[key] !== undefined) {
                 console.warn(`Duplicate param name is not allowed: "${key}" has "${map[key]}" already / skipped "${decodedValue}"`);
                 return map;
