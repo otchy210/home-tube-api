@@ -1,10 +1,10 @@
 import { execSync } from 'child_process';
 import { statSync } from 'fs';
-import { copyFile, mkdir, writeFile } from '../utils/fsPromises';
 import { basename, join } from 'path';
 import { CONVERTED_MP4, SNAPSHOT, THUMBNAIL } from '../const';
 import { VideoMeta } from '../types';
 import { execPromise } from '../utils/ChildProcessUtils';
+import { copyFile, mkdir, writeFile } from '../utils/fsPromises';
 import logger from '../utils/logger';
 import { parsePath } from '../utils/PathUtils';
 import { formatTimeInSecond } from '../utils/TimeUtils';

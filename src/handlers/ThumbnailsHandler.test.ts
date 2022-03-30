@@ -1,9 +1,9 @@
 import { RequestContext, RequestParams } from '../types';
 import { BAD_REQUEST, NOT_FOUND } from '../utils/ServerResponseUtils';
-import { thumbnailsHandler } from './ThumbnailsHandler';
 import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
 import { useThumbnailsManager } from '../videos/ThumbnailsManager';
 import { useVideoCollection } from '../videos/VideoCollection';
+import { thumbnailsHandler } from './ThumbnailsHandler';
 
 describe('ThumbnailsHandler', () => {
     beforeAll(() => {

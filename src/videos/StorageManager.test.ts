@@ -1,6 +1,6 @@
-import { useStorageManager } from './StorageManager';
-import { initialize as initializeMetaManager, useMetaManager } from './MetaManager';
 import { existsSync } from 'fs';
+import { initialize as initializeMetaManager, useMetaManager } from './MetaManager';
+import { useStorageManager } from './StorageManager';
 
 describe('StorageManager', () => {
     initializeMetaManager();

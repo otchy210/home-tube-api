@@ -1,8 +1,8 @@
-import { initializeWorkers, stopWorkers } from '../videos/FFMpegWorkersManager';
 import { RequestContext, RequestParams } from '../types';
-import { BAD_REQUEST } from '../utils/ServerResponseUtils';
-import { usePropertiesManager } from '../videos/PropertiesManager';
 import * as sru from '../utils/ServerRequestUtils';
+import { BAD_REQUEST } from '../utils/ServerResponseUtils';
+import { initializeWorkers, stopWorkers } from '../videos/FFMpegWorkersManager';
+import { usePropertiesManager } from '../videos/PropertiesManager';
 import { detailsHandler } from './DetailsHandler';
 
 describe('detailsHandler', () => {

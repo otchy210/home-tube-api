@@ -1,8 +1,8 @@
+import { Document } from '@otchy/sim-doc-db/dist/types';
 import { RequestContext, RequestHandlerResponse, RequestParams, VideoDocument } from '../types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { useVideoCollection } from '../videos/VideoCollection';
 import { searchHandler } from './SearchHandler';
-import { Document } from '@otchy/sim-doc-db/dist/types';
 
 describe('SearchHandler', () => {
     describe('get', () => {

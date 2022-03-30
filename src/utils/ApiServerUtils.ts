@@ -1,5 +1,10 @@
 import { ServerResponse } from 'http';
+import send = require('send');
+import * as yargs from 'yargs';
+import { DEFAULT_API_PORT } from '../const';
 import { ApiServerConfig, Json, RequestContext, RequestHandler, RequestHandlerResponse, RequestParams } from '../types';
+import { getDefaultAppConfigPath } from './AppConfigUtils';
+import logger from './logger';
 import {
     buildJsonResponseHeaders,
     isErrorResponse,
@@ -10,11 +15,6 @@ import {
     writeMethodNotAllowed,
     writeNotFound,
 } from './ServerResponseUtils';
-import send = require('send');
-import logger from './logger';
-import * as yargs from 'yargs';
-import { getDefaultAppConfigPath } from './AppConfigUtils';
-import { DEFAULT_API_PORT } from '../const';
 
 export const parseArgv = (): ApiServerConfig => {
     const defaultAppConfig = getDefaultAppConfigPath();

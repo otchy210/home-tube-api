@@ -1,8 +1,8 @@
-import { propertiesHandler } from './PropertiesHandler';
 import { RequestContext, RequestParams, Json } from '../types';
 import * as sru from '../utils/ServerRequestUtils';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
 import { usePropertiesManager } from '../videos/PropertiesManager';
+import { propertiesHandler } from './PropertiesHandler';
 
 describe('PropertiesHandler', () => {
     const path = 'test/storage1/test-movie.mp4';

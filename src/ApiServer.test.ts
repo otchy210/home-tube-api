@@ -1,5 +1,5 @@
-import ApiServer from './ApiServer';
 import * as request from 'supertest';
+import ApiServer from './ApiServer';
 
 describe('ApiServer', () => {
     const tmpConfig = `tmp/${Math.random().toString(32).substring(2)}/test-config.json`;

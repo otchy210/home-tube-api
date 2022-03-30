@@ -1,7 +1,7 @@
-import { BAD_REQUEST, isErrorResponse } from '../utils/ServerResponseUtils';
 import { RequestHandler, RequestMethod } from '../types';
-import { usePropertiesManager } from '../videos/PropertiesManager';
 import { validateAndGetVideo } from '../utils/ServerRequestUtils';
+import { BAD_REQUEST, isErrorResponse } from '../utils/ServerResponseUtils';
+import { usePropertiesManager } from '../videos/PropertiesManager';
 
 export const propertiesHandler: RequestHandler & { post: RequestMethod } = {
     path: '/properties',

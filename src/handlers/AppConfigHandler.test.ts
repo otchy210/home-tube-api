@@ -1,8 +1,8 @@
-import { TEST_CONFIG } from '../utils/TestConst';
-import { appConfigHandler } from './AppConfigHandler';
+import ApiServer from '../ApiServer';
 import { Json, RequestContext } from '../types';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
-import ApiServer from '../ApiServer';
+import { TEST_CONFIG } from '../utils/TestConst';
+import { appConfigHandler } from './AppConfigHandler';
 
 describe('appConfigHandler', () => {
     it('handles GET properly', () => {

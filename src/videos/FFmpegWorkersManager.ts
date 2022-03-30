@@ -1,7 +1,7 @@
 import { initialize as initializeMataManager, reinstantiate as reinstantiateMetaManager, useMetaManager } from './MetaManager';
-import { initialize as initializeThumbnailsManager, reinstantiate as reinstantiateThumbnailsManager, useThumbnailsManager } from './ThumbnailsManager';
-import { initialize as initializeSnapshotManager, reinstantiate as reinstantiateSnapshotManager, useSnapshotManager } from './SnapshotManager';
 import { initialize as initializeMp4Manager, reinstantiate as reinstantiateMp4Manager, useMp4Manager } from './Mp4Manager';
+import { initialize as initializeSnapshotManager, reinstantiate as reinstantiateSnapshotManager, useSnapshotManager } from './SnapshotManager';
+import { initialize as initializeThumbnailsManager, reinstantiate as reinstantiateThumbnailsManager, useThumbnailsManager } from './ThumbnailsManager';
 
 export const initializeWorkers = (ffmpeg?: string): void => {
     initializeMataManager(ffmpeg);

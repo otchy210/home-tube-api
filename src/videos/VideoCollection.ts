@@ -1,6 +1,6 @@
+import { basename } from 'path';
 import { Collection } from '@otchy/sim-doc-db';
 import { Query, Document, Field } from '@otchy/sim-doc-db/dist/types';
-import { basename } from 'path';
 import { LENGTH_TAGS, SIZE_TAGS } from '../const';
 import { AllTags, VideoMeta, VideoProperties } from '../types';
 import { sha256 } from '../utils/StringUtils';

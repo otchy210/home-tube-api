@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { readFile, writeFile } from '../utils/fsPromises';
 import { basename, join } from 'path';
 import { isRequiredVideoMeta, VideoMeta } from '../types';
+import { readFile, writeFile } from '../utils/fsPromises';
 import { parsePath } from '../utils/PathUtils';
 import FFmpegWorker, { ConsumeParams } from './FFmpegWorker';
 import { useMp4Manager } from './Mp4Manager';

@@ -1,7 +1,7 @@
-import { readdir } from '../utils/fsPromises';
 import { join } from 'path';
 import { META_DIR } from '../const';
 import { StorageMonitorStatus } from '../types';
+import { readdir } from '../utils/fsPromises';
 
 // https://en.wikipedia.org/wiki/Video_file_format
 const MOVIE_EXTENSIONS = new Set(['webm', 'mkv', 'flv', 'avi', 'mov', 'wmv', 'rm', 'mp4', 'm4v', 'mpg', 'mpg2', 'mpeg', 'mpeg2', '3gp']);

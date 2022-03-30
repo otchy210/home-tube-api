@@ -1,8 +1,8 @@
 import { RequestContext, RequestHandlerResponse, RequestParams, StaticFileResponse } from '../types';
-import { snapshotHandler } from './SnapshotHandler';
 import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
-import { useVideoCollection } from '../videos/VideoCollection';
 import { useSnapshotManager } from '../videos/SnapshotManager';
+import { useVideoCollection } from '../videos/VideoCollection';
+import { snapshotHandler } from './SnapshotHandler';
 
 describe('SnapshotHandler', () => {
     beforeAll(() => {
