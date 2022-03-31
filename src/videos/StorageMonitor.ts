@@ -99,8 +99,12 @@ export default class StorageMonitor {
     }
 
     public rename(srcPath: string, destPath: string): Promise<void> {
-        const added = new Set<string>([destPath]);
+        this.current.delete(srcPath);
         const removed = new Set<string>([srcPath]);
+
+        this.current.add(destPath);
+        const added = new Set<string>([destPath]);
+
         return this.listener(added, removed);
     }
 

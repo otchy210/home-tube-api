@@ -5,6 +5,8 @@ import { isRequiredVideoMeta } from '../types';
 import { parsePath } from '../utils/PathUtils';
 import FFmpeg, { formatSeekTime } from './FFmpeg';
 
+jest.setTimeout(10000);
+
 describe('formatSeekTime', () => {
     it('works', () => {
         expect(formatSeekTime(0)).toBe('00:00:00');
