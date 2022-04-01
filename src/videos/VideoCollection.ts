@@ -13,13 +13,16 @@ export const getNames = (path: string): string[] => {
         .filter((name) => {
             return !(name.length === 0 || name === '.' || name === '..');
         })
-        .map((name, i, array) => {
+        .reduce((arr, name, i, array) => {
             if (i !== array.length - 1) {
-                return name;
+                arr.push(name);
+                return arr;
             }
             const dotIndex = name.lastIndexOf('.');
-            return name.substring(0, dotIndex);
-        });
+            arr.push(name.slice(0, dotIndex));
+            arr.push(name.slice(dotIndex + 1));
+            return arr;
+        }, [] as string[]);
 };
 
 const fields: Field[] = [

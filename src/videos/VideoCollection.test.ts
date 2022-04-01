@@ -3,10 +3,10 @@ import { getNames, useVideoCollection } from './VideoCollection';
 
 describe('getNames', () => {
     it('works', () => {
-        expect(getNames('/abc/def/ghi.mp4')).toStrictEqual(['abc', 'def', 'ghi']);
-        expect(getNames('./abc.mp4')).toStrictEqual(['abc']);
-        expect(getNames('../abc//def.mp4')).toStrictEqual(['abc', 'def']);
-        expect(getNames('\\\\abc\\def.mp4')).toStrictEqual(['abc', 'def']);
+        expect(getNames('/abc/def/ghi.mp4')).toStrictEqual(['abc', 'def', 'ghi', 'mp4']);
+        expect(getNames('./abc.mp4')).toStrictEqual(['abc', 'mp4']);
+        expect(getNames('../abc//def.mp4')).toStrictEqual(['abc', 'def', 'mp4']);
+        expect(getNames('\\\\abc\\def.mp4')).toStrictEqual(['abc', 'def', 'mp4']);
     });
 });
 
@@ -31,7 +31,7 @@ describe('VideoCollection', () => {
             key: 'LmScC35-sEgPDA08IQLe3U02x4tUd3PXaJ32QopI2tQ',
             path: '/path/to/日本語動画.mp4',
             name: '日本語動画.mp4',
-            names: ['path', 'to', '日本語動画'],
+            names: ['path', 'to', '日本語動画', 'mp4'],
         });
         videoCollection.remove('/path/to/日本語動画.mp4');
     });
