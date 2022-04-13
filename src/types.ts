@@ -16,6 +16,11 @@ export type AppConfig = {
     ffmpeg?: string;
 };
 
+export type AppConfigValidationError = {
+    message: string;
+    source: string;
+};
+
 export type RequestParams = {
     [key: string]: Json;
 };
