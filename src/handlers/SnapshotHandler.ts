@@ -26,7 +26,7 @@ export const snapshotHandler: RequestHandler & { get: RequestMethod; post: Reque
         const response: StaticFileResponse = {
             path: snapshotPath,
         };
-        return { body: response, maxAge: 60 * 10 };
+        return { body: response };
     },
     post: ({ params, body }) => {
         if (!body) {
