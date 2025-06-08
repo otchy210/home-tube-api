@@ -30,7 +30,7 @@ describe('FFmpeg', () => {
                 duration: '0:03',
                 fileSize: 1504413,
                 height: 1080,
-                length: 3.08,
+                length: 3.05,
                 mtime: mtime1,
                 name: 'test-movie.mp4',
                 width: 1920,

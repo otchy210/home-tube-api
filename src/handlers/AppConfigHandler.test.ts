@@ -32,7 +32,7 @@ describe('appConfigHandler', () => {
             const mockedBody = {
                 storages: [
                     {
-                        path: '/path/to/updated/storage',
+                        path: 'test/storage1',
                         enabled: true,
                     },
                 ],
@@ -48,7 +48,7 @@ describe('appConfigHandler', () => {
             expect(mockedApiServer.saveAppConfig).toBeCalledWith({
                 storages: [
                     {
-                        path: '/path/to/updated/storage',
+                        path: 'test/storage1',
                         enabled: true,
                     },
                 ],
