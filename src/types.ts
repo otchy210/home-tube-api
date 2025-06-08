@@ -152,3 +152,9 @@ export type SizeTag = {
     tag: string;
     label: string;
 };
+
+export type Folder = {
+    path: string;
+    name: string;
+    folders: Folder[];
+};
