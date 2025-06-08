@@ -95,3 +95,11 @@ $ git config --local core.hooksPath .githooks
 ```bash
 $ git config --local core.hooksPath .githooks
 ```
+
+## 開発 (Japanese)
+
+### 初期設定
+
+```bash
+$ git config --local core.hooksPath .githooks
+```
