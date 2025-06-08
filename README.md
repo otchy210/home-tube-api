@@ -45,7 +45,7 @@ $ git config --local core.hooksPath .githooks
 4. **Configuration** details can be found in `src/utils/AppConfigUtils.ts`.
 5. **Video processing workflow** is implemented under `src/videos/`.
 
-## リポジトリ概要 (Japanese)
+## リポジトリ概要 (日本語)
 
 このプロジェクトは TypeScript/Node.js 製の API サーバー **HomeTube API** です。エントリーポイントは `src/index.ts` で `ApiServer` をエクスポートしています。`npm start` で使用される `bin/home-tube-api` スクリプトは TypeScript ソースをビルドしてからサーバーを起動します。
 
@@ -87,19 +87,3 @@ $ git config --local core.hooksPath .githooks
 3. **HTTP エンドポイントの構造** は `src/handlers/` や `src/**/*.test.ts` を見て理解しましょう
 4. **設定ファイル** の構造は `src/utils/AppConfigUtils.ts` を参照しましょう
 5. **動画処理のワークフロー** は `src/videos/` を読んで把握してください
-
-## Development
-
-### Initial setup
-
-```bash
-$ git config --local core.hooksPath .githooks
-```
-
-## 開発 (Japanese)
-
-### 初期設定
-
-```bash
-$ git config --local core.hooksPath .githooks
-```
