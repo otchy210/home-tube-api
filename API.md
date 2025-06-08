@@ -79,6 +79,12 @@ Return status of workers and storages.
 
 Response body: `ServerStatus`.
 
+### GET `/folders`
+List enabled storage folders recursively. `.home-tube` directories are
+ignored.
+
+Response body: array of `Folder` objects.
+
 ---
 
 # HomeTube API リファレンス (日本語)
@@ -149,3 +155,8 @@ Response body: `ServerStatus`.
 ワーカーとストレージの状態を返します。
 
 レスポンスボディ: `ServerStatus`
+
+### GET `/folders`
+有効なストレージフォルダを再帰的に一覧します。`.home-tube` ディレクトリは除外されます。
+
+レスポンスボディ: `Folder` の配列

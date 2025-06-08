@@ -5,6 +5,7 @@ import { convertHandler } from './ConvertHandler';
 import { detailsHandler } from './DetailsHandler';
 import { propertiesHandler } from './PropertiesHandler';
 import { renameHandler } from './RenameHandler';
+import { foldersHandler } from './FoldersHandler';
 import { searchHandler } from './SearchHandler';
 import { serverStatusHandler } from './ServerStatusHandler';
 import { snapshotHandler } from './SnapshotHandler';
@@ -23,4 +24,5 @@ export const defaultRequestHandlers: RequestHandler[] = [
     allTagsHandler,
     serverStatusHandler,
     renameHandler,
+    foldersHandler,
 ];
