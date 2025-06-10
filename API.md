@@ -43,6 +43,11 @@ Query parameter `key` must be specified and request body should contain any of
 Rename a file. Requires `key` and `name` query parameters.
 The response returns the updated `VideoValues` of the renamed file.
 
+### POST `/move`
+Move a file to another location. Requires `key` and `dest` query parameters.
+Associated metadata in the `.home-tube` folder is moved as well.
+The response returns the updated `VideoValues` of the moved file.
+
 ### POST `/convert`
 Enqueue conversion job. Requires `key` and `type=mp4` parameters.
 Returns `{ status: 'queued' | 'processing' | 'available' }` indicating the
@@ -126,6 +131,11 @@ Response body: array of `Folder` objects.
 ### POST `/rename`
 ファイル名を変更します。`key` と `name` クエリパラメータが必要です。
 レスポンスとして変更後の `VideoValues` が返されます。
+
+### POST `/move`
+ファイルを別の場所へ移動します。`key` と `dest` クエリパラメータが必要です。
+動画ファイルとともに `.home-tube` フォルダ内のメタデータも移動されます。
+レスポンスとして移動後の `VideoValues` が返されます。
 
 ### POST `/convert`
 変換ジョブを登録します。`key` と `type=mp4` が必要です。

@@ -74,4 +74,13 @@ describe('StorageManager', () => {
             storageManager.renameFileAndMetaDir(destPath, srcPath);
         });
     });
+
+    describe('move', () => {
+        const storageManager = useStorageManager();
+        it('delegates to rename', async () => {
+            const spy = jest.spyOn(storageManager, 'rename').mockResolvedValue();
+            await storageManager.move('a.mp4', 'b.mp4');
+            expect(spy).toBeCalledWith('a.mp4', 'b.mp4');
+        });
+    });
 });
