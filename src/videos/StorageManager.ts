@@ -65,6 +65,14 @@ class StorageManager {
         return destMonitor.rename(srcPath, destPath);
     }
 
+    /**
+     * Moves a video file to a new location along with its metadata.
+     * Internally this reuses {@ link rename} as moving requires the same logic.
+     */
+    public async move(srcPath: string, destPath: string): Promise<void> {
+        return this.rename(srcPath, destPath);
+    }
+
     private getMonitor(videoPath: string): StorageMonitor | undefined {
         const monitors = Array.from(this.monitorMap.entries())
             .filter(([path]) => {
