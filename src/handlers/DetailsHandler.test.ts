@@ -1,7 +1,7 @@
 import { RequestContext, RequestParams } from '../types';
 import * as sru from '../utils/ServerRequestUtils';
 import { BAD_REQUEST } from '../utils/ServerResponseUtils';
-import { initializeWorkers, stopWorkers } from '../videos/FFMpegWorkersManager';
+import { initializeWorkers, stopWorkers } from '../videos/FFmpegWorkersManager';
 import { usePropertiesManager } from '../videos/PropertiesManager';
 import { detailsHandler } from './DetailsHandler';
 
