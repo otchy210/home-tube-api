@@ -94,7 +94,7 @@ class StorageManager {
         // rename meta dir
         if (existsSync(srcMetaDir)) {
             if (!existsSync(destMetaDir)) {
-                mkdirSync(destMetaDir);
+                mkdirSync(destMetaDir, { recursive: true });
             }
             readdirSync(srcMetaDir).forEach((file) => {
                 if (file.startsWith('.')) {
