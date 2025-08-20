@@ -17,6 +17,7 @@ describe('readDir', () => {
             expect(result.size).toBe(2);
             expect(result.has(`${root}/a/b/a/test-movie.mp4`)).toBe(true);
             expect(result.has(`${root}/b/test-movie.avi`)).toBe(true);
+            expect(result.has(`${root}/.hidden-movie.mp4`)).toBe(false);
         });
     });
 });
