@@ -51,15 +51,6 @@ describe('StorageManager', () => {
                 done();
             });
         });
-
-        it('should be rejected when srcMonitor and destMonitor are different', (done) => {
-            const srcPath = './test/storage1/test-movie.mp4';
-            const destPath = './test/storage2/test-movie-renamed.mp4';
-            storageManager.rename(srcPath, destPath).catch((error) => {
-                expect(error).toContain('srcPath and destPath should belong to the same storage');
-                done();
-            });
-        });
     });
 
     describe('renameFileAndMetaDir', () => {

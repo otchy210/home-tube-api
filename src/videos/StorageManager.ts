@@ -56,9 +56,6 @@ class StorageManager {
         if (!destMonitor) {
             return Promise.reject(`destMonitor not found: ${destPath}`);
         }
-        if (srcMonitor !== destMonitor) {
-            return Promise.reject(`srcPath and destPath should belong to the same storage: ${srcPath}, ${destPath}`);
-        }
 
         this.renameFileAndMetaDir(srcPath, destPath);
 
