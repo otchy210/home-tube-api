@@ -22,6 +22,9 @@ export const readDir = (path: string, set: Set<string>): Promise<boolean> => {
                         promises.push(readDir(currentPath, set));
                     }
                 } else if (dirent.isFile()) {
+                    if (dirent.name.startsWith('.')) {
+                        continue;
+                    }
                     const extension = getExtension(dirent.name);
                     if (MOVIE_EXTENSIONS.has(extension)) {
                         set.add(currentPath);
