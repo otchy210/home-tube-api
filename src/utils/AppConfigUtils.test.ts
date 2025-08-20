@@ -25,6 +25,14 @@ describe('validateAppConfig', () => {
         expect(validateAppConfig({ storages: [] })).toStrictEqual([]);
     });
 
+    it('skips existence check for disabled storages', () => {
+        expect(
+            validateAppConfig({
+                storages: [{ path: './test/storage9', enabled: false }],
+            })
+        ).toStrictEqual([]);
+    });
+
     it('returns proper error messages when there are validation errors', () => {
         expect(
             validateAppConfig({
