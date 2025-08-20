@@ -1,4 +1,4 @@
-import { initializeWorkers, stopWorkers } from './FFMpegWorkersManager';
+import { initializeWorkers, stopWorkers } from './FFmpegWorkersManager';
 import { useMetaManager } from './MetaManager';
 import { useSnapshotManager } from './SnapshotManager';
 import { useThumbnailsManager } from './ThumbnailsManager';

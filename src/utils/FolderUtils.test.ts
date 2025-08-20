@@ -12,6 +12,11 @@ describe('listFolders', () => {
                     name: 'a',
                     folders: [
                         {
+                            path: 'test/storage2/a/a',
+                            name: 'a',
+                            folders: [],
+                        },
+                        {
                             path: 'test/storage2/a/b',
                             name: 'b',
                             folders: [
