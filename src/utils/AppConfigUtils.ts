@@ -24,7 +24,7 @@ export const loadAppConfig = (path: string): AppConfig => {
 export const validateAppConfig = (appConfig: AppConfig): AppConfigValidationError[] => {
     const results: AppConfigValidationError[] = [];
     appConfig.storages.forEach((storage) => {
-        if (!existsSync(storage.path)) {
+        if (storage.enabled && !existsSync(storage.path)) {
             results.push({
                 message: "Storage doesn't exist",
                 source: storage.path,
