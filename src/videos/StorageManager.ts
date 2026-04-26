@@ -8,6 +8,16 @@ import StorageMonitor, { StorageListener } from './StorageMonitor';
 
 const MONITOR_INTERVAL = 10 * 60; // 10 mins
 
+export type StorageManagerErrorCode = 'ENOENT' | 'EEXIST';
+
+export type StorageManagerError = Error & { code: StorageManagerErrorCode };
+
+const createStorageManagerError = (message: string, code: StorageManagerErrorCode): StorageManagerError => {
+    const error = new Error(message) as StorageManagerError;
+    error.code = code;
+    return error;
+};
+
 class StorageManager {
     private monitorMap = new Map<string, StorageMonitor>();
 
@@ -43,18 +53,18 @@ class StorageManager {
 
     public async rename(srcPath: string, destPath: string): Promise<void> {
         if (!existsSync(srcPath)) {
-            return Promise.reject(`${srcPath} does't exist`);
+            throw createStorageManagerError(`${srcPath} does't exist`, 'ENOENT');
         }
         if (existsSync(destPath)) {
-            return Promise.reject(`${destPath} exists already`);
+            throw createStorageManagerError(`${destPath} exists already`, 'EEXIST');
         }
         const srcMonitor = this.getMonitor(srcPath);
         const destMonitor = this.getMonitor(destPath);
         if (!srcMonitor) {
-            return Promise.reject(`srcMonitor not found: ${srcPath}`);
+            throw createStorageManagerError(`srcMonitor not found: ${srcPath}`, 'ENOENT');
         }
         if (!destMonitor) {
-            return Promise.reject(`destMonitor not found: ${destPath}`);
+            throw createStorageManagerError(`destMonitor not found: ${destPath}`, 'ENOENT');
         }
 
         this.renameFileAndMetaDir(srcPath, destPath);

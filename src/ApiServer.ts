@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http';
 import { DEFAULT_API_PORT } from './const';
 import { defaultRequestHandlers } from './handlers/defaultRequestHandlers';
-import { AppConfig, RequestHandler, RequestContext, Storage, ApiServerConfig, VideoMeta } from './types';
+import { AnyRequestHandler, AppConfig, RequestContext, Storage, ApiServerConfig, VideoMeta } from './types';
 import { handleRequest, parseArgv } from './utils/ApiServerUtils';
 import { getDefaultAppConfigPath, loadAppConfig, saveAppConfig } from './utils/AppConfigUtils';
 import { getLocalIpv4Addresses } from './utils/NetworkUtils';
@@ -15,9 +15,9 @@ export default class ApiServer {
     private appConfigPath: string;
     private appConfig: AppConfig;
     private httpServer: HttpServer;
-    private requestHandlers = new Map<string, RequestHandler>();
+    private requestHandlers = new Map<string, AnyRequestHandler>();
 
-    public constructor(apiServerConfig?: ApiServerConfig, requestHandlers: RequestHandler[] = defaultRequestHandlers) {
+    public constructor(apiServerConfig?: ApiServerConfig, requestHandlers: AnyRequestHandler[] = defaultRequestHandlers) {
         const config = apiServerConfig ?? parseArgv();
 
         this.port = config.port ?? DEFAULT_API_PORT;
@@ -80,8 +80,13 @@ export default class ApiServer {
     }
 
     public start(): Promise<ApiServer> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            const handleError = (error: Error) => {
+                reject(error);
+            };
+            this.httpServer.once('error', handleError);
             this.httpServer.listen(this.port, () => {
+                this.httpServer.off('error', handleError);
                 resolve(this);
             });
         });

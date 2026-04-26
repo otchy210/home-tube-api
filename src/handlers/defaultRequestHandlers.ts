@@ -1,4 +1,4 @@
-import { RequestHandler } from '../types';
+import { AnyRequestHandler } from '../types';
 import { allTagsHandler } from './AllTagsHandler';
 import { appConfigHandler } from './AppConfigHandler';
 import { convertHandler } from './ConvertHandler';
@@ -13,7 +13,7 @@ import { snapshotHandler } from './SnapshotHandler';
 import { thumbnailsHandler } from './ThumbnailsHandler';
 import { videoHandler } from './VideoHandler';
 
-export const defaultRequestHandlers: RequestHandler[] = [
+export const defaultRequestHandlers: AnyRequestHandler[] = [
     appConfigHandler,
     searchHandler,
     detailsHandler,

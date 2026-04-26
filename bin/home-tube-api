@@ -7,4 +7,7 @@ const { ApiServer } = require("../dist");
 const apiServer = new ApiServer();
 apiServer.start().then(() => {
     apiServer.showInitialMessages();
+}).catch((error) => {
+    console.error(error);
+    process.exit(1);
 });

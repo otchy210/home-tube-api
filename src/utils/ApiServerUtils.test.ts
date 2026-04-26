@@ -72,16 +72,19 @@ describe('ApiServerUtils', () => {
     });
 
     describe('handleRequestEnd', () => {
-        it.each([['GET'], ['POST'], ['DELETE']])('responds "method not allowed" when method %s is called but the handler doesn\'t support it', (method) => {
-            const mockedContext = { ...defaultMockedContext, request: { method, url: '/path', ...defaultMockedRequest } } as RequestContext;
-            const mockedResponse = {} as ServerResponse;
-            const mockedRequestHandler = {} as RequestHandler;
+        it.each([['GET'], ['POST'], ['DELETE']])(
+            'responds "method not allowed" when method %s is called but the handler doesn\'t support it',
+            async (method) => {
+                const mockedContext = { ...defaultMockedContext, request: { method, url: '/path', ...defaultMockedRequest } } as RequestContext;
+                const mockedResponse = {} as ServerResponse;
+                const mockedRequestHandler = {} as RequestHandler;
 
-            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
+                await handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
 
-            expect(mockedWriteMethodNotAllowed).toBeCalledTimes(1);
-        });
-        it('responds "ok" when GET method goes well', () => {
+                expect(mockedWriteMethodNotAllowed).toBeCalledTimes(1);
+            }
+        );
+        it('responds "ok" when GET method goes well', async () => {
             const mockedContext = { ...defaultMockedContext, request: { method: 'GET', url: '/path', ...defaultMockedRequest } } as RequestContext;
             const mockedResponse = {
                 writeHead: jest.fn(),
@@ -93,7 +96,7 @@ describe('ApiServerUtils', () => {
             } as unknown as RequestHandler;
             mockedBuildJsonResponseHeaders.mockReturnValue({ dummy: '1' });
 
-            handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
+            await handleRequestEnd(mockedContext, mockedResponse, mockedRequestHandler);
 
             expect(mockedResponse.writeHead).toBeCalledWith(200, expect.any(Object));
             expect(mockedResponse.write).toBeCalledWith('{"result":"ok"}');

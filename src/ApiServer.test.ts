@@ -5,12 +5,12 @@ describe('ApiServer', () => {
     const tmpConfig = `tmp/${Math.random().toString(32).substring(2)}/test-config.json`;
 
     let apiServer: ApiServer;
-    beforeAll(() => {
+    beforeAll(async () => {
         apiServer = new ApiServer({
-            port: 12345,
+            port: 0,
             appConfig: tmpConfig,
         });
-        apiServer.start();
+        await apiServer.start();
     });
     it('returns 404 for unkown path', () => {
         request(apiServer.getHttpServer()).get('/dummy').expect(404);

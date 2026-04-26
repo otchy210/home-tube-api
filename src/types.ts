@@ -49,11 +49,20 @@ export type RequestHandlerResponse = {
 
 export type RequestMethod = (context: RequestContext) => RequestHandlerResponse;
 
+export type AsyncRequestMethod = (context: RequestContext) => Promise<RequestHandlerResponse>;
+
 export type RequestHandler = {
     path: string;
     get?: RequestMethod;
     post?: RequestMethod;
     delete?: RequestMethod;
+};
+
+export type AnyRequestHandler = {
+    path: string;
+    get?: RequestMethod | AsyncRequestMethod;
+    post?: RequestMethod | AsyncRequestMethod;
+    delete?: RequestMethod | AsyncRequestMethod;
 };
 
 type JsonPrimitive = string | number | boolean | null;

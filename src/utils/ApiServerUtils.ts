@@ -2,7 +2,7 @@ import { ServerResponse } from 'http';
 import send = require('send');
 import * as yargs from 'yargs';
 import { DEFAULT_API_PORT } from '../const';
-import { ApiServerConfig, Json, RequestContext, RequestHandler, RequestHandlerResponse, RequestParams } from '../types';
+import { AnyRequestHandler, ApiServerConfig, Json, RequestContext, RequestHandlerResponse, RequestParams } from '../types';
 import { getDefaultAppConfigPath } from './AppConfigUtils';
 import logger from './logger';
 import {
@@ -59,7 +59,7 @@ export const parseUrl = (url: string): { urlPath: string; params?: RequestParams
     return { urlPath, params };
 };
 
-export const handleRequestEnd = (context: RequestContext, response: ServerResponse, handler: RequestHandler) => {
+export const handleRequestEnd = async (context: RequestContext, response: ServerResponse, handler: AnyRequestHandler): Promise<void> => {
     let handlerResponse: RequestHandlerResponse | undefined;
     const origin = context.request?.headers?.origin;
     try {
@@ -69,21 +69,21 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
                     writeMethodNotAllowed(response, origin);
                     return;
                 }
-                handlerResponse = handler.get(context);
+                handlerResponse = await handler.get(context);
                 break;
             case 'POST':
                 if (handler?.post === undefined) {
                     writeMethodNotAllowed(response, origin);
                     return;
                 }
-                handlerResponse = handler.post(context);
+                handlerResponse = await handler.post(context);
                 break;
             case 'DELETE':
                 if (handler?.delete === undefined) {
                     writeMethodNotAllowed(response, origin);
                     return;
                 }
-                handlerResponse = handler.delete(context);
+                handlerResponse = await handler.delete(context);
                 break;
         }
         if (handlerResponse === undefined) {
@@ -116,7 +116,7 @@ export const handleRequestEnd = (context: RequestContext, response: ServerRespon
     }
 };
 
-export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, RequestHandler>) => {
+export const handleRequest = (context: RequestContext, response: ServerResponse, requestHandlers: Map<string, AnyRequestHandler>) => {
     const { method, url } = context.request;
     const origin = context.request?.headers?.origin;
     if (method === undefined) {
@@ -162,6 +162,6 @@ export const handleRequest = (context: RequestContext, response: ServerResponse,
             const bodyBuffer = Buffer.concat(bodyChunks);
             context.body = JSON.parse(bodyBuffer.toString()) as Json;
         }
-        handleRequestEnd(context, response, handler);
+        void handleRequestEnd(context, response, handler);
     });
 };

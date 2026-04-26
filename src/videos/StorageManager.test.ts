@@ -20,7 +20,9 @@ describe('StorageManager', () => {
             const srcPath = './test/dummy.mp4';
             const destPath = './test/storage1/test-movie-renamed.mp4';
             storageManager.rename(srcPath, destPath).catch((error) => {
-                expect(error).toContain("does't exist");
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toContain("does't exist");
+                expect(error.code).toBe('ENOENT');
                 done();
             });
         });
@@ -29,7 +31,9 @@ describe('StorageManager', () => {
             const srcPath = './test/storage1/test-movie.mp4';
             const destPath = './test/storage1/test-movie.mp4';
             storageManager.rename(srcPath, destPath).catch((error) => {
-                expect(error).toContain('exists already');
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toContain('exists already');
+                expect(error.code).toBe('EEXIST');
                 done();
             });
         });
@@ -38,7 +42,9 @@ describe('StorageManager', () => {
             const srcPath = './test/storage3/test-movie.mp4';
             const destPath = './test/storage1/test-movie-renamed.mp4';
             storageManager.rename(srcPath, destPath).catch((error) => {
-                expect(error).toContain('srcMonitor not found');
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toContain('srcMonitor not found');
+                expect(error.code).toBe('ENOENT');
                 done();
             });
         });
@@ -47,7 +53,9 @@ describe('StorageManager', () => {
             const srcPath = './test/storage1/test-movie.mp4';
             const destPath = './test/storage3/test-movie-renamed.mp4';
             storageManager.rename(srcPath, destPath).catch((error) => {
-                expect(error).toContain('destMonitor not found');
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toContain('destMonitor not found');
+                expect(error.code).toBe('ENOENT');
                 done();
             });
         });

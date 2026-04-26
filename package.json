@@ -1,13 +1,13 @@
 {
     "name": "@otchy/home-tube-api",
-    "version": "0.15.5",
+    "version": "0.15.6",
     "description": "API Server for HomeTube",
     "main": "dist/index.js",
     "files": [
         "dist"
     ],
     "scripts": {
-        "build": "rm -rf dist/* && tsc",
+        "build": "rm -rf dist/* && tsc -p tsconfig.build.json",
         "test": "jest",
         "lint": "eslint src/*",
         "lint:fix": "eslint --fix src/*",
